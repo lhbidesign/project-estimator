@@ -221,8 +221,8 @@ export default function ProjectMeta({
           />
         </div>
 
-        {/* Validity period */}
-        <div className="flex items-center gap-2">
+        {/* Validity period — quick buttons + expiry date picker */}
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
             style={{ fontFamily: 'var(--font-body)' }}>Valid</span>
           <div className="flex gap-1">
@@ -241,6 +241,27 @@ export default function ProjectMeta({
               </button>
             ))}
           </div>
+          <span className="text-zinc-300 text-xs">or</span>
+          {/* Expiry date picker — synced with validDays */}
+          <input
+            type="date"
+            value={
+              estimateDate
+                ? new Date(new Date(estimateDate + 'T12:00:00').getTime() + validDays * 864e5)
+                    .toISOString().slice(0, 10)
+                : ''
+            }
+            min={estimateDate ?? undefined}
+            onChange={e => {
+              if (!e.target.value || !estimateDate) return
+              const days = Math.max(1, Math.round(
+                (new Date(e.target.value + 'T12:00:00') - new Date(estimateDate + 'T12:00:00')) / 864e5
+              ))
+              setValidDays(days)
+            }}
+            className="focus-light border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-zinc-700 bg-white outline-none focus:border-zinc-900 cursor-pointer"
+            style={{ fontFamily: 'var(--font-body)' }}
+          />
         </div>
 
         <span className="text-zinc-200 text-sm hidden lg:block">|</span>

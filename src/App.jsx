@@ -142,19 +142,11 @@ export default function App() {
     setEstimateNumber(est.estimateNumber ?? null)
     setClientAddress(est.clientAddress ?? '')
     setValidDays(est.validDays ?? 30)
+    // Prefer matching by stable ID, fall back to name match
     if (est.clientId && clients.find(c => c.id === est.clientId)) {
       setClientId(est.clientId)
-    } else if (est.clientName) {
-      const existing = clients.find(c => c.name === est.clientName)
-      if (existing) {
-        setClientId(existing.id)
-      } else {
-        const id = `client_${nanoid()}`
-        setClients(prev => [...prev, { id, name: est.clientName, contacts: [] }])
-        setClientId(id)
-      }
     } else {
-      setClientId('')
+      resolveClient(est.clientName ?? '')
     }
     setCurrentEstimateId(est.id)
     setHistoryOpen(false)
@@ -185,36 +177,34 @@ export default function App() {
   }
 
   // ── Preset / AI ──
-  function loadPreset(preset) {
-    const newSections = preset.sections.map(s => ({ ...s, id: nanoid() }))
-    resetHistory(newSections)
-    setProjectName(preset.projectName)
-    setPmPercent(preset.pmPercent)
-    const match = clients.find(c => c.name === preset.clientName)
+  function resolveClient(name) {
+    if (!name) { setClientId(''); return }
+    const match = clients.find(c => c.name === name)
     if (match) {
       setClientId(match.id)
     } else {
       const id = `client_${nanoid()}`
-      setClients(prev => [...prev, { id, name: preset.clientName, contacts: [] }])
+      setClients(prev => [...prev, { id, name, contacts: [] }])
       setClientId(id)
     }
-    setContact('')
+  }
+
+  function loadPreset(preset) {
+    resetHistory(preset.sections.map(s => ({ ...s, id: nanoid() })))
+    setProjectName(preset.projectName)
+    setPmPercent(preset.pmPercent)
+    resolveClient(preset.clientName)
+    setContact(preset.contact ?? '')
+    setClientAddress('')
     setCurrentEstimateId(null)
   }
 
   function applyGenerated(data) {
     if (data.sections?.length) resetHistory(data.sections)
     if (data.projectName) setProjectName(data.projectName)
-    if (data.clientName) {
-      const match = clients.find(c => c.name === data.clientName)
-      if (match) {
-        setClientId(match.id)
-      } else {
-        const id = `client_${nanoid()}`
-        setClients(prev => [...prev, { id, name: data.clientName, contacts: [] }])
-        setClientId(id)
-      }
-    }
+    resolveClient(data.clientName ?? '')
+    setContact('')
+    setClientAddress('')
     setCurrentEstimateId(null)
     setPage('estimator')
   }

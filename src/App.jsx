@@ -439,7 +439,7 @@ export default function App() {
           <div className="flex flex-col items-end gap-1 flex-shrink-0">
             <img src={`${import.meta.env.BASE_URL}lhbi-logo.png`} alt="Little House Studio"
               className="h-24 w-auto object-contain" />
-            <p className="text-zinc-300 text-xs font-bold tracking-[0.25em] uppercase"
+            <p className="text-zinc-500 text-sm font-bold tracking-[0.25em] uppercase"
               style={{ fontFamily: 'var(--font-display)' }}>
               Estimate
             </p>
@@ -493,7 +493,7 @@ export default function App() {
                     alt="Little House Studio"
                     className="h-24 w-auto object-contain"
                   />
-                  <p className="text-zinc-300 text-xs font-bold tracking-[0.25em] uppercase"
+                  <p className="text-zinc-500 text-sm font-bold tracking-[0.25em] uppercase"
                     style={{ fontFamily: 'var(--font-display)' }}>
                     Estimate
                   </p>

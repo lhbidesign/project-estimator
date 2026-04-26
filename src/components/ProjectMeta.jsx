@@ -141,7 +141,14 @@ export default function ProjectMeta({
           ) : (
             <select
               value={clientId}
-              onChange={e => { if (e.target.value === '__add__') { setAddingClient(true); return } setClientId(e.target.value); setContact(''); setOtherContact(false) }}
+              onChange={e => {
+                if (e.target.value === '__add__') { setAddingClient(true); return }
+                const selected = clients.find(c => c.id === e.target.value)
+                setClientId(e.target.value)
+                setContact('')
+                setOtherContact(false)
+                setClientAddress(selected?.address ?? '')
+              }}
               className={`focus-light border rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-800 bg-white outline-none focus:border-zinc-900 cursor-pointer appearance-none pr-7 ${saveError === 'client' ? 'border-red-300' : 'border-zinc-200'}`}
               style={selectStyle}
             >

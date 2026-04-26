@@ -43,4 +43,5 @@
   .print-show  { display: block !important; }
   body         { background: #fff !important; }
   nav          { display: none !important; }
+  main         { padding-top: 0 !important; }
 }

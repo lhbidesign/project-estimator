@@ -168,13 +168,23 @@ export default function AIGeneratePage({ onApply, onGoToSettings }) {
     <div className="pt-[68px] min-h-screen" style={{ background: 'var(--page-bg)' }}>
       <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-black text-zinc-900" style={{ fontFamily: 'var(--font-display)' }}>
-            Generate Estimate
-          </h1>
-          <p className="text-zinc-500 text-sm mt-1" style={{ fontFamily: 'var(--font-body)' }}>
-            Describe the project or attach a brief — Claude generates a scoped estimate using your rate card.
-          </p>
+        <div className="mb-8 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-zinc-900" style={{ fontFamily: 'var(--font-display)' }}>
+              Generate Estimate
+            </h1>
+            <p className="text-zinc-500 text-sm mt-1" style={{ fontFamily: 'var(--font-body)' }}>
+              Describe the project or attach a brief — Claude generates a scoped estimate using your rate card.
+            </p>
+          </div>
+          {apiKey && (
+            <div className="flex items-center gap-1.5 flex-shrink-0 pt-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+              <span className="text-xs text-zinc-400 font-medium" style={{ fontFamily: 'var(--font-body)' }}>
+                AI ready
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -182,24 +192,8 @@ export default function AIGeneratePage({ onApply, onGoToSettings }) {
           {/* ── Left: inputs ── */}
           <div className="lg:col-span-3 space-y-4">
 
-            {/* API Key status */}
-            {apiKey ? (
-              <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
-                  <span className="text-sm font-semibold text-green-700" style={{ fontFamily: 'var(--font-body)' }}>
-                    API key configured
-                  </span>
-                </div>
-                <button
-                  onClick={onGoToSettings}
-                  className="focus-light text-xs font-bold text-green-600 hover:text-green-800 uppercase tracking-wider transition-colors"
-                  style={{ fontFamily: 'var(--font-body)' }}
-                >
-                  Manage in Settings →
-                </button>
-              </div>
-            ) : (
+            {/* API Key status — only show warning if missing */}
+            {!apiKey && (
               <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />

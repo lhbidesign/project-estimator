@@ -14,6 +14,7 @@ import { nanoid }       from './utils/nanoid.js'
 import { calcProject }  from './utils/calc.js'
 import { useRates }     from './contexts/RatesContext.jsx'
 import { DEFAULT_CLIENTS } from './data/clients.js'
+import { binRead, binWrite, getSyncConfig } from './utils/sharedStorage.js'
 
 const ESTIMATES_KEY = 'lh-estimates'
 
@@ -33,6 +34,7 @@ export default function App() {
   const [saveError,      setSaveError]      = useState('')
   const [savedEstimates, setSavedEstimates] = useState(loadStoredEstimates)
   const [currentEstimateId, setCurrentEstimateId] = useState(null)
+  const [syncLoading,    setSyncLoading]    = useState(false)
 
   // Project fields
   const [projectName,     setProjectName]     = useState('')
@@ -63,6 +65,30 @@ export default function App() {
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
   }, [undo, redo])
+
+  // On first load, pull shared estimates from JSONbin if configured
+  useEffect(() => {
+    const { apiKey, binId } = getSyncConfig()
+    if (!apiKey || !binId) return
+    setSyncLoading(true)
+    binRead(apiKey, binId)
+      .then(record => {
+        const shared = record?.estimates ?? []
+        if (shared.length > 0) {
+          setSavedEstimates(shared)
+          localStorage.setItem(ESTIMATES_KEY, JSON.stringify(shared))
+        }
+      })
+      .catch(() => {}) // fail silently — localStorage is the fallback
+      .finally(() => setSyncLoading(false))
+  }, [])
+
+  // Write updated estimates to JSONbin if configured
+  async function syncToShared(estimates) {
+    const { apiKey, binId } = getSyncConfig()
+    if (!apiKey || !binId) return
+    binWrite(apiKey, binId, { estimates }).catch(() => {})
+  }
 
   const clientName = clients.find(c => c.id === clientId)?.name ?? ''
 
@@ -98,6 +124,7 @@ export default function App() {
     }
     setSavedEstimates(updated)
     localStorage.setItem(ESTIMATES_KEY, JSON.stringify(updated))
+    syncToShared(updated)
     setJustSaved(true)
     setTimeout(() => setJustSaved(false), 2000)
   }
@@ -134,6 +161,7 @@ export default function App() {
     const updated = savedEstimates.filter(e => e.id !== id)
     setSavedEstimates(updated)
     localStorage.setItem(ESTIMATES_KEY, JSON.stringify(updated))
+    syncToShared(updated)
   }
 
   function resetEstimate() {
@@ -334,33 +362,46 @@ export default function App() {
 
       <main className="pt-[120px]">
         <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
-          <div className="no-print mb-10 pb-8 border-b border-zinc-100 flex justify-between items-start gap-6 flex-wrap">
-            <div>
-              <p className="text-xs font-black uppercase tracking-widest mb-2"
-                style={{ color: '#4e6300', fontFamily: 'var(--font-body)' }}>
-                Little House Studio
-              </p>
-              <h1 className="text-4xl font-black text-zinc-900 leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
-                {projectName || 'Project Estimate'}
-              </h1>
-              {(clientName || contact) && (
-                <p className="text-zinc-500 text-sm font-medium mt-1.5" style={{ fontFamily: 'var(--font-body)' }}>
-                  {[clientName, contact].filter(Boolean).join(' · ')}
+          <div className="no-print mb-10 pb-8 border-b border-zinc-100">
+            {/* Logo + Print row */}
+            <div className="flex items-start justify-between gap-6 mb-6">
+              {/* Studio logo */}
+              <img
+                src={`${import.meta.env.BASE_URL}lhbi-logo.png`}
+                alt="Little House Studio"
+                className="h-10 w-auto object-contain"
+              />
+              {/* Date + Print */}
+              <div className="flex flex-col items-end gap-3">
+                <p className="text-zinc-400 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
+                  {estimateDate
+                    ? new Date(estimateDate + 'T12:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                    : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                  }
                 </p>
-              )}
+                <button
+                  onClick={() => window.print()}
+                  className="focus-light px-4 py-2 border border-zinc-300 text-zinc-500 text-xs font-bold uppercase tracking-widest hover:border-zinc-900 hover:text-zinc-900 transition-all rounded-lg"
+                  style={{ fontFamily: 'var(--font-body)' }}
+                >
+                  Print / Export
+                </button>
+              </div>
             </div>
-            <div className="flex flex-col items-end gap-3 pt-1 no-print">
-              <p className="text-zinc-400 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
-                {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+            {/* Project info */}
+            <h1 className="text-4xl font-black text-zinc-900 leading-tight mb-1.5"
+              style={{ fontFamily: 'var(--font-display)' }}>
+              {projectName || 'Project Estimate'}
+            </h1>
+            {(clientName || contact) && (
+              <p className="text-zinc-500 text-sm font-medium" style={{ fontFamily: 'var(--font-body)' }}>
+                {[clientName, contact].filter(Boolean).join(' · ')}
               </p>
-              <button
-                onClick={() => window.print()}
-                className="focus-light px-4 py-2 border border-zinc-300 text-zinc-500 text-xs font-bold uppercase tracking-widest hover:border-zinc-900 hover:text-zinc-900 transition-all rounded-lg"
-                style={{ fontFamily: 'var(--font-body)' }}
-              >
-                Print / Export
-              </button>
-            </div>
+            )}
+            {estimateNumber && (
+              <p className="text-xs text-zinc-400 font-mono mt-1">{estimateNumber}</p>
+            )}
           </div>
           {estimatorContent}
         </div>

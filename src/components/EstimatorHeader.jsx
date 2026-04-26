@@ -6,17 +6,15 @@ const PAGES = [
 
 function LightningBolt() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="#CCFF00"
+    <img
+      src={`${import.meta.env.BASE_URL}lhbi-bolt.png`}
+      alt="Little House"
       className="w-auto flex-shrink-0"
       style={{
         height: '35px',
         filter: 'drop-shadow(0 0 6px #CCFF00) drop-shadow(0 0 16px rgba(204,255,0,0.45))',
       }}
-    >
-      <path d="M10.5 2 L3 13.5 H9 L7.5 22 L21 10.5 H15 L18 2 Z" />
-    </svg>
+    />
   )
 }
 

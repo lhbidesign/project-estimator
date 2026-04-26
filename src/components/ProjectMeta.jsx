@@ -13,6 +13,21 @@ const selectStyle = {
   backgroundSize: '1rem',
 }
 
+function UndoIcon() {
+  return (
+    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 7v6h6" /><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+    </svg>
+  )
+}
+function RedoIcon() {
+  return (
+    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 7v6h-6" /><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" />
+    </svg>
+  )
+}
+
 export default function ProjectMeta({
   projectName, setProjectName,
   clients, setClients,
@@ -20,8 +35,11 @@ export default function ProjectMeta({
   contact, setContact,
   projectDesigner, setProjectDesigner,
   hideHours, setHideHours,
-  onSave, justSaved,
+  estimateDate, setEstimateDate,
+  estimateNumber,
+  onSave, justSaved, saveError,
   onReset,
+  onUndo, onRedo, canUndo, canRedo,
 }) {
   const { resources } = useRates()
   const [addingClient, setAddingClient] = useState(false)
@@ -43,24 +61,43 @@ export default function ProjectMeta({
 
   return (
     <div className="mb-6">
-      {/* Row 1: project name + Save/Reset */}
-      <div className="flex items-center gap-3 mb-4">
+      {/* Row 1: project name + undo/redo/reset/save */}
+      <div className="flex items-center gap-2 mb-4">
         <input
           value={projectName}
           onChange={e => setProjectName(e.target.value)}
           placeholder="Project name"
-          className="focus-light flex-1 bg-transparent text-3xl font-black text-zinc-900 placeholder-zinc-300 border-none outline-none min-w-0"
+          className={`focus-light flex-1 bg-transparent text-3xl font-black text-zinc-900 placeholder-zinc-300 border-none outline-none min-w-0 ${saveError === 'name' ? 'placeholder-red-400' : ''}`}
           style={{ fontFamily: 'var(--font-display)' }}
           aria-label="Project name"
         />
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <button
-            onClick={onReset}
-            className="focus-light text-xs font-bold uppercase tracking-wider text-zinc-400 hover:text-zinc-700 border border-zinc-200 hover:border-zinc-400 px-3 py-1.5 rounded-lg transition-all"
-            style={{ fontFamily: 'var(--font-body)' }}
-          >
-            Reset
-          </button>
+
+        {/* Undo / Redo */}
+        <button
+          onClick={onUndo} disabled={!canUndo}
+          className="focus-light w-7 h-7 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+          aria-label="Undo" title="Undo (⌘Z)"
+        >
+          <UndoIcon />
+        </button>
+        <button
+          onClick={onRedo} disabled={!canRedo}
+          className="focus-light w-7 h-7 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+          aria-label="Redo" title="Redo (⌘⇧Z)"
+        >
+          <RedoIcon />
+        </button>
+
+        <div className="w-px h-4 bg-zinc-200 mx-1" />
+
+        <button
+          onClick={onReset}
+          className="focus-light text-xs font-bold uppercase tracking-wider text-zinc-400 hover:text-zinc-700 border border-zinc-200 hover:border-zinc-400 px-3 py-1.5 rounded-lg transition-all"
+          style={{ fontFamily: 'var(--font-body)' }}
+        >
+          Reset
+        </button>
+        <div className="flex flex-col items-end gap-0.5">
           <button
             onClick={onSave}
             className="focus-light text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-lg transition-all"
@@ -74,6 +111,11 @@ export default function ProjectMeta({
           >
             {justSaved ? '✓ Saved' : 'Save'}
           </button>
+          {saveError && (
+            <p className="text-[10px] text-red-500 font-semibold" style={{ fontFamily: 'var(--font-body)' }}>
+              {saveError === 'name' ? 'Add a project name' : 'Select a client'}
+            </p>
+          )}
         </div>
       </div>
 
@@ -98,7 +140,7 @@ export default function ProjectMeta({
             <select
               value={clientId}
               onChange={e => { if (e.target.value === '__add__') { setAddingClient(true); return } setClientId(e.target.value); setContact(''); setOtherContact(false) }}
-              className="focus-light border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-800 bg-white outline-none focus:border-zinc-900 cursor-pointer appearance-none pr-7"
+              className={`focus-light border rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-800 bg-white outline-none focus:border-zinc-900 cursor-pointer appearance-none pr-7 ${saveError === 'client' ? 'border-red-300' : 'border-zinc-200'}`}
               style={selectStyle}
             >
               <option value="">Select client…</option>
@@ -140,7 +182,7 @@ export default function ProjectMeta({
 
         <span className="text-zinc-200 text-sm hidden sm:block">|</span>
 
-        {/* Project Designer */}
+        {/* Designer */}
         <div className="flex items-center gap-2">
           <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
             style={{ fontFamily: 'var(--font-body)' }}>Designer</span>
@@ -156,11 +198,32 @@ export default function ProjectMeta({
           </select>
         </div>
 
+        <span className="text-zinc-200 text-sm hidden lg:block">|</span>
+
+        {/* Estimate number + Date */}
+        {estimateNumber && (
+          <span className="text-xs font-black text-zinc-400 tabular" style={{ fontFamily: 'var(--font-body)' }}>
+            {estimateNumber}
+          </span>
+        )}
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
+            style={{ fontFamily: 'var(--font-body)' }}>Date</span>
+          <input
+            type="date"
+            value={estimateDate}
+            onChange={e => setEstimateDate(e.target.value)}
+            className="focus-light border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-700 bg-white outline-none focus:border-zinc-900 cursor-pointer"
+            style={{ fontFamily: 'var(--font-body)' }}
+          />
+        </div>
+
         {/* Hide hours toggle */}
         <label className="flex items-center gap-2 ml-auto cursor-pointer">
           <div
             onClick={() => setHideHours(v => !v)}
-            className={`relative w-8 h-4.5 rounded-full transition-colors cursor-pointer flex-shrink-0 ${hideHours ? 'bg-zinc-800' : 'bg-zinc-200'}`}
+            className={`relative rounded-full transition-colors cursor-pointer flex-shrink-0 ${hideHours ? 'bg-zinc-800' : 'bg-zinc-200'}`}
             style={{ height: '18px', width: '32px' }}
             role="switch"
             aria-checked={hideHours}

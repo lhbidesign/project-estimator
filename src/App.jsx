@@ -30,6 +30,7 @@ export default function App() {
   const [view,           setView]           = useState('internal')
   const [historyOpen,    setHistoryOpen]    = useState(false)
   const [justSaved,      setJustSaved]      = useState(false)
+  const [saveError,      setSaveError]      = useState('')
   const [savedEstimates, setSavedEstimates] = useState(loadStoredEstimates)
   const [currentEstimateId, setCurrentEstimateId] = useState(null)
 
@@ -41,6 +42,8 @@ export default function App() {
   const [projectDesigner, setProjectDesigner] = useState('stef')
   const [pmPercent,       setPmPercent]       = useState(15)
   const [hideHours,       setHideHours]       = useState(false)
+  const [estimateDate,    setEstimateDate]    = useState(() => new Date().toISOString().slice(0, 10))
+  const [estimateNumber,  setEstimateNumber]  = useState(null)
 
   // Undo/redo for sections
   const { sections, push, undo, redo, canUndo, canRedo, reset: resetHistory } = useHistory([blankSection()])
@@ -63,12 +66,26 @@ export default function App() {
 
   const clientName = clients.find(c => c.id === clientId)?.name ?? ''
 
+  function getNextEstimateNumber() {
+    const n = parseInt(localStorage.getItem('lh-est-counter') ?? '0', 10) + 1
+    localStorage.setItem('lh-est-counter', String(n))
+    return `EST-${String(n).padStart(4, '0')}`
+  }
+
   // ── Save / Load ──
   function saveEstimate() {
-    const p = calcProject(sections, pmPercent, resources, pmRate)
+    if (!projectName.trim()) { setSaveError('name'); setTimeout(() => setSaveError(''), 3000); return }
+    if (!clientId)           { setSaveError('client'); setTimeout(() => setSaveError(''), 3000); return }
+
+    const p   = calcProject(sections, pmPercent, resources, pmRate)
+    const num = estimateNumber ?? getNextEstimateNumber()
+    if (!estimateNumber) setEstimateNumber(num)
+
     const est = {
       id: currentEstimateId ?? nanoid(),
       savedAt: new Date().toISOString(),
+      estimateNumber: num,
+      estimateDate,
       projectName, clientId, clientName, contact, projectDesigner, pmPercent, sections,
       totalBilled: p.totalBilled,
     }
@@ -92,6 +109,8 @@ export default function App() {
     setContact(est.contact ?? '')
     setProjectDesigner(est.projectDesigner ?? 'stef')
     setPmPercent(est.pmPercent ?? 15)
+    setEstimateDate(est.estimateDate ?? new Date().toISOString().slice(0, 10))
+    setEstimateNumber(est.estimateNumber ?? null)
     if (est.clientId && clients.find(c => c.id === est.clientId)) {
       setClientId(est.clientId)
     } else if (est.clientName) {
@@ -125,6 +144,8 @@ export default function App() {
     setProjectDesigner('stef')
     setPmPercent(15)
     setHideHours(false)
+    setEstimateDate(new Date().toISOString().slice(0, 10))
+    setEstimateNumber(null)
     resetHistory([blankSection()])
     setCurrentEstimateId(null)
   }
@@ -178,7 +199,6 @@ export default function App() {
     onLoadPreset: loadPreset,
     onOpenHistory: () => setHistoryOpen(true),
     savedCount: savedEstimates.length,
-    onUndo: undo, onRedo: redo, canUndo, canRedo,
     onOpenSettings: () => setPage('settings'),
   }
 
@@ -210,9 +230,11 @@ export default function App() {
     contact, setContact,
     projectDesigner, setProjectDesigner,
     hideHours, setHideHours,
-    onSave: saveEstimate,
-    justSaved,
+    estimateDate, setEstimateDate,
+    estimateNumber,
+    onSave: saveEstimate, justSaved, saveError,
     onReset: resetEstimate,
+    onUndo: undo, onRedo: redo, canUndo, canRedo,
   }
 
   // ── ESTIMATOR — shared content ──
@@ -257,7 +279,7 @@ export default function App() {
         <EstimatorHeader {...headerProps} />
         <ViewToggleBar view={view} setView={setView} />
 
-        <main className="pt-[120px]">
+        <main className="pt-[140px]">
           <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
             <ProjectMeta {...metaProps} />
             <BudgetCalculator pmPercent={pmPercent} projectDesigner={projectDesigner} onAddItems={addItemsToFirst} />
@@ -271,7 +293,7 @@ export default function App() {
               Little House Studio — Internal use only
             </span>
             <span className="text-xs text-zinc-400 tabular" style={{ fontFamily: 'var(--font-body)' }}>
-              Studio $150/hr · On-call $200/hr · PM $45/hr
+              Studio $150–$200/hr · On-call $200/hr · PM $75/hr
             </span>
           </div>
         </footer>

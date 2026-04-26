@@ -15,27 +15,10 @@ function GearIcon() {
   )
 }
 
-function UndoIcon() {
-  return (
-    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 7v6h6" /><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
-    </svg>
-  )
-}
-
-function RedoIcon() {
-  return (
-    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 7v6h-6" /><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" />
-    </svg>
-  )
-}
-
 export default function EstimatorHeader({
   page, setPage,
   onLoadPreset,
   onOpenHistory, savedCount,
-  onUndo, onRedo, canUndo, canRedo,
   onOpenSettings,
 }) {
   return (
@@ -48,8 +31,12 @@ export default function EstimatorHeader({
         borderBottom: '1px solid rgba(255,255,255,0.07)',
       }}
     >
-      {/* Wordmark */}
-      <div className="flex items-center gap-2.5 flex-shrink-0">
+      {/* Wordmark — click to go home */}
+      <button
+        onClick={() => setPage('estimator')}
+        className="flex items-center gap-2.5 flex-shrink-0 focus-light rounded-lg px-1 -mx-1 hover:opacity-80 transition-opacity"
+        aria-label="Go to Estimator"
+      >
         <img
           src={`${import.meta.env.BASE_URL}lh-logo.png`}
           alt="Little House"
@@ -63,9 +50,9 @@ export default function EstimatorHeader({
         <span className="text-white/50 text-xs font-semibold tracking-widest uppercase" style={{ fontFamily: 'var(--font-body)' }}>
           Estimator
         </span>
-      </div>
+      </button>
 
-      {/* Center — page tabs (always visible) */}
+      {/* Center tabs */}
       <div className="flex items-end gap-0 h-full absolute left-1/2 -translate-x-1/2" role="tablist">
         {PAGES.map(p => (
           <button
@@ -94,27 +81,6 @@ export default function EstimatorHeader({
       <div className="flex items-center gap-1 flex-shrink-0">
         {page === 'estimator' && (
           <>
-            {/* Undo / Redo */}
-            <button
-              onClick={onUndo} disabled={!canUndo}
-              className="focus-light w-8 h-8 rounded-lg flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 disabled:opacity-25 disabled:cursor-not-allowed transition-all"
-              aria-label="Undo (⌘Z)"
-              title="Undo (⌘Z)"
-            >
-              <UndoIcon />
-            </button>
-            <button
-              onClick={onRedo} disabled={!canRedo}
-              className="focus-light w-8 h-8 rounded-lg flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 disabled:opacity-25 disabled:cursor-not-allowed transition-all"
-              aria-label="Redo (⌘⇧Z)"
-              title="Redo (⌘⇧Z)"
-            >
-              <RedoIcon />
-            </button>
-
-            <div className="w-px h-4 bg-white/10 mx-1" />
-
-            {/* History */}
             <button
               onClick={onOpenHistory}
               className="flex items-center gap-1.5 text-white/50 hover:text-white text-xs font-bold uppercase tracking-wider transition-colors px-3 py-1.5 rounded-lg hover:bg-white/10"
@@ -127,13 +93,11 @@ export default function EstimatorHeader({
                 </span>
               )}
             </button>
-
             <PresetLoader onLoad={onLoadPreset} />
             <div className="w-px h-4 bg-white/10 mx-1" />
           </>
         )}
 
-        {/* Gear / Settings */}
         <button
           onClick={onOpenSettings}
           className={`focus-light w-8 h-8 rounded-lg flex items-center justify-center transition-all ${

@@ -81,11 +81,9 @@ function fileIcon(file) {
   return '📝'
 }
 
-export default function AIGeneratePage({ onApply }) {
+export default function AIGeneratePage({ onApply, onGoToSettings }) {
   const { resources, hourGuides, pmRate } = useRates()
 
-  const [apiKey,  setApiKey]  = useState(() => localStorage.getItem(KEY_STORE) ?? '')
-  const [showKey, setShowKey] = useState(!localStorage.getItem(KEY_STORE))
   const [brief,   setBrief]   = useState('')
   const [files,   setFiles]   = useState([])
   const [loading, setLoading] = useState(false)
@@ -94,11 +92,7 @@ export default function AIGeneratePage({ onApply }) {
   const fileRef = useRef()
   const dropRef = useRef()
 
-  function saveKey(k) {
-    setApiKey(k)
-    if (k) localStorage.setItem(KEY_STORE, k)
-    else localStorage.removeItem(KEY_STORE)
-  }
+  const apiKey = localStorage.getItem(KEY_STORE) ?? ''
 
   function addFiles(incoming) {
     setFiles(prev => [...prev, ...Array.from(incoming)])
@@ -188,36 +182,40 @@ export default function AIGeneratePage({ onApply }) {
           {/* ── Left: inputs ── */}
           <div className="lg:col-span-3 space-y-4">
 
-            {/* API Key */}
-            <div className="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <label className="text-xs font-black uppercase tracking-widest text-zinc-500"
-                  style={{ fontFamily: 'var(--font-body)' }}>Anthropic API Key</label>
+            {/* API Key status */}
+            {apiKey ? (
+              <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+                  <span className="text-sm font-semibold text-green-700" style={{ fontFamily: 'var(--font-body)' }}>
+                    API key configured
+                  </span>
+                </div>
                 <button
-                  onClick={() => setShowKey(v => !v)}
-                  className="focus-light text-xs text-zinc-400 hover:text-zinc-700 font-semibold transition-colors"
+                  onClick={onGoToSettings}
+                  className="focus-light text-xs font-bold text-green-600 hover:text-green-800 uppercase tracking-wider transition-colors"
                   style={{ fontFamily: 'var(--font-body)' }}
                 >
-                  {showKey ? 'Hide' : 'Change'}
+                  Manage in Settings →
                 </button>
               </div>
-              {showKey ? (
-                <div className="space-y-2">
-                  <input
-                    type="password" value={apiKey} onChange={e => saveKey(e.target.value)}
-                    placeholder="sk-ant-…"
-                    className="focus-light w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm text-zinc-900 bg-white outline-none focus:border-zinc-900 font-mono"
-                  />
-                  <p className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
-                    Stored in your browser only — never sent anywhere except directly to Anthropic.
-                  </p>
+            ) : (
+              <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+                  <span className="text-sm font-semibold text-amber-700" style={{ fontFamily: 'var(--font-body)' }}>
+                    No API key configured
+                  </span>
                 </div>
-              ) : (
-                <p className="text-sm text-zinc-500 font-mono">
-                  {apiKey ? `${apiKey.slice(0, 10)}${'•'.repeat(12)}` : <span className="text-zinc-400 italic">Not set</span>}
-                </p>
-              )}
-            </div>
+                <button
+                  onClick={onGoToSettings}
+                  className="focus-light text-xs font-bold text-amber-600 hover:text-amber-800 uppercase tracking-wider transition-colors"
+                  style={{ fontFamily: 'var(--font-body)' }}
+                >
+                  Add in Settings →
+                </button>
+              </div>
+            )}
 
             {/* Brief */}
             <div className="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm">

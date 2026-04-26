@@ -6,16 +6,32 @@ import CategorySection  from './components/CategorySection.jsx'
 import SummaryPanel     from './components/SummaryPanel.jsx'
 import RateCardPage     from './components/RateCardPage.jsx'
 import AIGeneratePage   from './components/AIGeneratePage.jsx'
+import SettingsPage     from './components/SettingsPage.jsx'
+import EstimatesDrawer  from './components/EstimatesDrawer.jsx'
 import { nanoid }       from './utils/nanoid.js'
+import { calcProject }  from './utils/calc.js'
+import { useRates }     from './contexts/RatesContext.jsx'
 import { DEFAULT_CLIENTS } from './data/clients.js'
+
+const ESTIMATES_KEY = 'lh-estimates'
+
+function loadStoredEstimates() {
+  try { return JSON.parse(localStorage.getItem(ESTIMATES_KEY) ?? '[]') }
+  catch { return [] }
+}
 
 function blankSection() {
   return { id: nanoid(), label: '', items: [] }
 }
 
 export default function App() {
+  const { resources, pmRate } = useRates()
+
   const [page,            setPage]            = useState('estimator')
   const [view,            setView]            = useState('internal')
+  const [historyOpen,     setHistoryOpen]     = useState(false)
+  const [justSaved,       setJustSaved]       = useState(false)
+  const [savedEstimates,  setSavedEstimates]  = useState(loadStoredEstimates)
 
   // Project state
   const [projectName,     setProjectName]     = useState('')
@@ -28,6 +44,60 @@ export default function App() {
 
   const clientName = clients.find(c => c.id === clientId)?.name ?? ''
 
+  // ── Estimate persistence ──
+  function saveEstimate() {
+    const p = calcProject(sections, pmPercent, resources, pmRate)
+    const est = {
+      id: nanoid(),
+      savedAt: new Date().toISOString(),
+      projectName,
+      clientId,
+      clientName,
+      contact,
+      projectDesigner,
+      pmPercent,
+      sections,
+      totalBilled: p.totalBilled,
+    }
+    const updated = [est, ...savedEstimates].slice(0, 50)
+    setSavedEstimates(updated)
+    localStorage.setItem(ESTIMATES_KEY, JSON.stringify(updated))
+    setJustSaved(true)
+    setTimeout(() => setJustSaved(false), 2000)
+  }
+
+  function loadEstimate(est) {
+    setProjectName(est.projectName ?? '')
+    setContact(est.contact ?? '')
+    setProjectDesigner(est.projectDesigner ?? 'stef')
+    setPmPercent(est.pmPercent ?? 15)
+    setSections((est.sections ?? [blankSection()]).map(s => ({ ...s, id: nanoid() })))
+    // Restore or register client
+    if (est.clientId && clients.find(c => c.id === est.clientId)) {
+      setClientId(est.clientId)
+    } else if (est.clientName) {
+      const existing = clients.find(c => c.name === est.clientName)
+      if (existing) {
+        setClientId(existing.id)
+      } else {
+        const id = `client_${nanoid()}`
+        setClients(prev => [...prev, { id, name: est.clientName, contacts: [] }])
+        setClientId(id)
+      }
+    } else {
+      setClientId('')
+    }
+    setHistoryOpen(false)
+    setPage('estimator')
+  }
+
+  function deleteEstimate(id) {
+    const updated = savedEstimates.filter(e => e.id !== id)
+    setSavedEstimates(updated)
+    localStorage.setItem(ESTIMATES_KEY, JSON.stringify(updated))
+  }
+
+  // ── Preset / AI apply ──
   function loadPreset(preset) {
     setProjectName(preset.projectName)
     setPmPercent(preset.pmPercent)
@@ -59,6 +129,7 @@ export default function App() {
     setPage('estimator')
   }
 
+  // ── Section management ──
   function updateSection(id, u) { setSections(prev => prev.map(s => s.id === id ? u : s)) }
   function deleteSection(id)    { setSections(prev => prev.length > 1 ? prev.filter(s => s.id !== id) : prev) }
   function addSection()         { setSections(prev => [...prev, blankSection()]) }
@@ -69,37 +140,71 @@ export default function App() {
     })
   }
 
-  /* ── Non-estimator pages ── */
-  if (page === 'rate-card') {
-    return (
-      <>
-        <EstimatorHeader page={page} setPage={setPage} view={view} setView={setView} onLoadPreset={loadPreset} />
-        <RateCardPage />
-      </>
-    )
-  }
-  if (page === 'generate') {
-    return (
-      <>
-        <EstimatorHeader page={page} setPage={setPage} view={view} setView={setView} onLoadPreset={loadPreset} />
-        <AIGeneratePage onApply={applyGenerated} />
-      </>
-    )
+  // ── Non-estimator pages ──
+  const headerProps = {
+    page, setPage, view, setView,
+    onLoadPreset: loadPreset,
+    onSave: saveEstimate,
+    justSaved,
+    savedCount: savedEstimates.length,
+    onOpenHistory: () => setHistoryOpen(true),
   }
 
-  /* ── INTERNAL VIEW ── */
+  if (page === 'rate-card') return (
+    <>
+      <EstimatorHeader {...headerProps} />
+      <RateCardPage />
+    </>
+  )
+  if (page === 'generate') return (
+    <>
+      <EstimatorHeader {...headerProps} />
+      <AIGeneratePage onApply={applyGenerated} onGoToSettings={() => setPage('settings')} />
+    </>
+  )
+  if (page === 'settings') return (
+    <>
+      <EstimatorHeader {...headerProps} />
+      <SettingsPage />
+    </>
+  )
+
+  // ── Shared estimator content ──
+  const estimatorContent = (
+    <>
+      {sections.map(section => (
+        <CategorySection
+          key={section.id}
+          section={section}
+          view={view}
+          projectDesigner={projectDesigner}
+          onChange={u => updateSection(section.id, u)}
+          onDeleteSection={() => deleteSection(section.id)}
+          isOnlySection={sections.length === 1}
+        />
+      ))}
+      <SummaryPanel
+        sections={sections}
+        pmPercent={pmPercent}
+        setPmPercent={setPmPercent}
+        view={view}
+      />
+    </>
+  )
+
+  // ── INTERNAL VIEW ──
   if (view === 'internal') {
     return (
       <div className="min-h-screen" style={{ background: 'var(--page-bg)' }}>
-        <EstimatorHeader page={page} setPage={setPage} view={view} setView={setView} onLoadPreset={loadPreset} />
+        <EstimatorHeader {...headerProps} />
 
         <main className="pt-[68px]">
           <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
             <ProjectMeta
-              projectName={projectName}     setProjectName={setProjectName}
-              clients={clients}             setClients={setClients}
-              clientId={clientId}           setClientId={setClientId}
-              contact={contact}             setContact={setContact}
+              projectName={projectName}         setProjectName={setProjectName}
+              clients={clients}                 setClients={setClients}
+              clientId={clientId}               setClientId={setClientId}
+              contact={contact}                 setContact={setContact}
               projectDesigner={projectDesigner} setProjectDesigner={setProjectDesigner}
             />
 
@@ -109,17 +214,7 @@ export default function App() {
               onAddItems={addItemsToFirst}
             />
 
-            {sections.map(section => (
-              <CategorySection
-                key={section.id}
-                section={section}
-                view="internal"
-                projectDesigner={projectDesigner}
-                onChange={u => updateSection(section.id, u)}
-                onDeleteSection={() => deleteSection(section.id)}
-                isOnlySection={sections.length === 1}
-              />
-            ))}
+            {estimatorContent}
 
             <button
               onClick={addSection}
@@ -128,8 +223,6 @@ export default function App() {
             >
               + Add program / section
             </button>
-
-            <SummaryPanel sections={sections} pmPercent={pmPercent} setPmPercent={setPmPercent} view="internal" />
           </div>
         </main>
 
@@ -139,41 +232,52 @@ export default function App() {
               Little House Studio — Internal use only
             </span>
             <span className="text-xs text-zinc-400 tabular" style={{ fontFamily: 'var(--font-body)' }}>
-              Studio $150/hr · On-call $200/hr · PM $75/hr
+              Studio $150/hr · On-call $200/hr · PM $45/hr
             </span>
           </div>
         </footer>
+
+        <EstimatesDrawer
+          open={historyOpen}
+          onClose={() => setHistoryOpen(false)}
+          estimates={savedEstimates}
+          onLoad={loadEstimate}
+          onDelete={deleteEstimate}
+        />
       </div>
     )
   }
 
-  /* ── CLIENT VIEW ── */
+  // ── CLIENT VIEW ──
   return (
     <div className="min-h-screen bg-white">
-      <EstimatorHeader page={page} setPage={setPage} view={view} setView={setView} onLoadPreset={loadPreset} />
+      <EstimatorHeader {...headerProps} />
 
       <div className="hidden print-show pt-8 pb-6 border-b border-zinc-200 px-16">
-        <p className="text-xs font-black uppercase tracking-widest mb-1" style={{ color: '#4e6300', fontFamily: 'var(--font-body)' }}>
+        <p className="text-xs font-black uppercase tracking-widest mb-1"
+          style={{ color: '#4e6300', fontFamily: 'var(--font-body)' }}>
           Little House Studio
         </p>
         <h1 className="text-2xl font-black text-zinc-900" style={{ fontFamily: 'var(--font-display)' }}>
           {projectName || 'Project Estimate'}
         </h1>
         {(clientName || contact) && (
-          <p className="text-zinc-500 text-sm mt-0.5">{[clientName, contact].filter(Boolean).join(' · ')}</p>
+          <p className="text-zinc-500 text-sm mt-0.5">
+            {[clientName, contact].filter(Boolean).join(' · ')}
+          </p>
         )}
       </div>
 
       <main className="pt-[68px]">
         <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
-
           <div className="no-print mb-10 pb-8 border-b border-zinc-100 flex justify-between items-start gap-6 flex-wrap">
             <div>
               <p className="text-xs font-black uppercase tracking-widest mb-2"
                 style={{ color: '#4e6300', fontFamily: 'var(--font-body)' }}>
                 Little House Studio
               </p>
-              <h1 className="text-4xl font-black text-zinc-900 leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
+              <h1 className="text-4xl font-black text-zinc-900 leading-tight"
+                style={{ fontFamily: 'var(--font-display)' }}>
                 {projectName || 'Project Estimate'}
               </h1>
               {(clientName || contact) && (
@@ -196,19 +300,7 @@ export default function App() {
             </div>
           </div>
 
-          {sections.map(section => (
-            <CategorySection
-              key={section.id}
-              section={section}
-              view="client"
-              projectDesigner={projectDesigner}
-              onChange={() => {}}
-              onDeleteSection={() => {}}
-              isOnlySection={sections.length === 1}
-            />
-          ))}
-
-          <SummaryPanel sections={sections} pmPercent={pmPercent} setPmPercent={setPmPercent} view="client" />
+          {estimatorContent}
         </div>
       </main>
     </div>

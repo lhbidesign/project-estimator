@@ -37,18 +37,19 @@ export default function App() {
   const [syncLoading,    setSyncLoading]    = useState(false)
 
   // Project fields
-  const [projectName,     setProjectName]     = useState('')
-  const [clients,         setClients]         = useState(DEFAULT_CLIENTS)
-  const [clientId,        setClientId]        = useState('')
-  const [contact,         setContact]         = useState('')
-  const [projectDesigner, setProjectDesigner] = useState('stef')
-  const [pmPercent,       setPmPercent]       = useState(15)
-  const [hideHours,       setHideHours]       = useState(false)
-  const [estimateDate,    setEstimateDate]    = useState(() => new Date().toISOString().slice(0, 10))
-  const [estimateNumber,  setEstimateNumber]  = useState(null)
-  const [clientAddress,   setClientAddress]   = useState('')
-  const [validDays,       setValidDays]       = useState(30)
-  const [footerNote,      setFooterNote]      = useState('50% deposit required to initiate project. Balance due upon completion unless otherwise agreed upon in writing.')
+  const [projectName,        setProjectName]        = useState('')
+  const [projectDescription, setProjectDescription] = useState('')
+  const [clients,            setClients]            = useState(DEFAULT_CLIENTS)
+  const [clientId,           setClientId]           = useState('')
+  const [contact,            setContact]            = useState('')
+  const [projectDesigner,    setProjectDesigner]    = useState('stef')
+  const [pmPercent,          setPmPercent]          = useState(15)
+  const [hideHours,          setHideHours]          = useState(false)
+  const [estimateDate,       setEstimateDate]       = useState(() => new Date().toISOString().slice(0, 10))
+  const [estimateNumber,     setEstimateNumber]     = useState(null)
+  const [clientAddress,      setClientAddress]      = useState('')
+  const [validDays,          setValidDays]          = useState(30)
+  const [footerNote,         setFooterNote]         = useState('50% deposit required to initiate project. Balance due upon completion unless otherwise agreed upon in writing.')
 
   // Undo/redo for sections
   const { sections, push, undo, redo, canUndo, canRedo, reset: resetHistory } = useHistory([blankSection()])
@@ -115,7 +116,7 @@ export default function App() {
       savedAt: new Date().toISOString(),
       estimateNumber: num,
       estimateDate, validDays, footerNote,
-      projectName, clientId, clientName, contact, clientAddress, projectDesigner, pmPercent, sections,
+      projectName, projectDescription, clientId, clientName, contact, clientAddress, projectDesigner, pmPercent, sections,
       totalBilled: p.totalBilled,
     }
     let updated
@@ -136,6 +137,7 @@ export default function App() {
     const newSections = (est.sections ?? [blankSection()]).map(s => ({ ...s, id: nanoid() }))
     resetHistory(newSections)
     setProjectName(est.projectName ?? '')
+    setProjectDescription(est.projectDescription ?? '')
     setContact(est.contact ?? '')
     setProjectDesigner(est.projectDesigner ?? 'stef')
     setPmPercent(est.pmPercent ?? 15)
@@ -165,6 +167,7 @@ export default function App() {
   function resetEstimate() {
     if (!confirm('Start a new estimate? All current data will be cleared.')) return
     setProjectName('')
+    setProjectDescription('')
     setClientId('')
     setContact('')
     setProjectDesigner('stef')
@@ -195,6 +198,7 @@ export default function App() {
   function loadPreset(preset) {
     resetHistory(preset.sections.map(s => ({ ...s, id: nanoid() })))
     setProjectName(preset.projectName)
+    setProjectDescription('')
     setPmPercent(preset.pmPercent)
     resolveClient(preset.clientName)
     setContact(preset.contact ?? '')
@@ -205,6 +209,7 @@ export default function App() {
   function applyGenerated(data) {
     if (data.sections?.length) resetHistory(data.sections)
     if (data.projectName) setProjectName(data.projectName)
+    setProjectDescription('')
     resolveClient(data.clientName ?? '')
     setContact('')
     setClientAddress('')
@@ -257,6 +262,7 @@ export default function App() {
   // ── Project meta props ──
   const metaProps = {
     projectName, setProjectName,
+    projectDescription, setProjectDescription,
     clients, setClients,
     clientId, setClientId,
     contact, setContact,
@@ -418,10 +424,15 @@ export default function App() {
       <div className="hidden print-show px-16 pt-10 pb-8 border-b-2 border-zinc-200">
         <div className="flex items-start justify-between gap-8">
           <div className="flex-1">
-            <h1 className="text-3xl font-black text-zinc-900 leading-tight mb-2"
+            <h1 className="text-3xl font-black text-zinc-900 leading-tight mb-0.5"
               style={{ fontFamily: 'var(--font-display)' }}>
               {projectName || 'Project Estimate'}
             </h1>
+            {projectDescription && (
+              <p className="text-zinc-500 text-sm font-medium mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+                {projectDescription}
+              </p>
+            )}
             {(clientName || contact) && (
               <p className="text-zinc-600 text-sm font-semibold" style={{ fontFamily: 'var(--font-body)' }}>
                 {[clientName, contact].filter(Boolean).join(' · ')}
@@ -461,10 +472,15 @@ export default function App() {
 
               {/* Left: project + client info */}
               <div className="flex-1">
-                <h1 className="text-4xl font-black text-zinc-900 leading-tight mb-2"
+                <h1 className="text-4xl font-black text-zinc-900 leading-tight mb-0.5"
                   style={{ fontFamily: 'var(--font-display)' }}>
                   {projectName || 'Project Estimate'}
                 </h1>
+                {projectDescription && (
+                  <p className="text-zinc-500 text-base font-medium mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+                    {projectDescription}
+                  </p>
+                )}
                 {(clientName || contact) && (
                   <p className="text-zinc-600 text-sm font-semibold" style={{ fontFamily: 'var(--font-body)' }}>
                     {[clientName, contact].filter(Boolean).join(' · ')}

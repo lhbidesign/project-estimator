@@ -30,6 +30,7 @@ function RedoIcon() {
 
 export default function ProjectMeta({
   projectName, setProjectName,
+  projectDescription, setProjectDescription,
   clients, setClients,
   clientId, setClientId,
   contact, setContact,
@@ -119,6 +120,18 @@ export default function ProjectMeta({
             </p>
           )}
         </div>
+      </div>
+
+      {/* Description */}
+      <div className="mb-4 -mt-2">
+        <input
+          value={projectDescription}
+          onChange={e => setProjectDescription(e.target.value)}
+          placeholder="Project description (e.g. Experiential Design & Print Graphics)"
+          className="focus-light w-full bg-transparent text-base font-medium text-zinc-500 placeholder-zinc-300 border-none outline-none"
+          style={{ fontFamily: 'var(--font-body)' }}
+          aria-label="Project description"
+        />
       </div>
 
       {/* Row 2: metadata */}

@@ -70,7 +70,7 @@ export default function ProjectMeta({
           value={projectName}
           onChange={e => setProjectName(e.target.value)}
           placeholder="Project name"
-          className={`focus-light flex-1 bg-transparent text-3xl font-black text-zinc-900 placeholder-zinc-300 border-none outline-none min-w-0 ${saveError === 'name' ? 'placeholder-red-400' : ''}`}
+          className={`focus-light flex-1 bg-transparent text-3xl font-black text-zinc-900 placeholder-zinc-400 border-none outline-none min-w-0 ${saveError === 'name' ? 'placeholder-red-400' : ''}`}
           style={{ fontFamily: 'var(--font-display)' }}
           aria-label="Project name"
         />
@@ -141,7 +141,7 @@ export default function ProjectMeta({
           value={projectDescription}
           onChange={e => setProjectDescription(e.target.value)}
           placeholder="Project description (e.g. Experiential Design & Print Graphics)"
-          className="focus-light w-full bg-transparent text-base font-medium text-zinc-500 placeholder-zinc-300 border-none outline-none"
+          className="focus-light w-full bg-transparent text-base font-medium text-zinc-500 placeholder-zinc-400 border-none outline-none"
           style={{ fontFamily: 'var(--font-body)' }}
           aria-label="Project description"
         />
@@ -276,7 +276,7 @@ export default function ProjectMeta({
       </div>
 
       {/* Row 3: Main Designer | EST# | Hide hours */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 pt-3 mt-1 border-t border-zinc-200">
 
         {/* Main Designer */}
         <div className="flex items-center gap-2">

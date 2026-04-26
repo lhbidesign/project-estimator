@@ -35,23 +35,25 @@ export default function ViewToggleBar({ view, setView, onOpenEstimates, savedCou
         </div>
       </div>
 
-      {/* Right-aligned: Estimates Log + Load Preset */}
-      <div className="ml-auto flex items-center gap-3 relative z-10">
-        <button
-          onClick={onOpenEstimates}
-          className="focus-light flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-zinc-900 border border-zinc-200 hover:border-zinc-400 px-3 py-2 rounded-lg transition-all bg-white"
-          style={{ fontFamily: 'var(--font-body)' }}
-        >
-          Estimates
-          {savedCount > 0 && (
-            <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-500 tabular">
-              {savedCount}
-            </span>
-          )}
-        </button>
+      {/* Right-aligned: Estimates Log + Load Preset — internal only */}
+      {view === 'internal' && (
+        <div className="ml-auto flex items-center gap-3 relative z-10">
+          <button
+            onClick={onOpenEstimates}
+            className="focus-light flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-zinc-900 border border-zinc-200 hover:border-zinc-400 px-3 py-2 rounded-lg transition-all bg-white"
+            style={{ fontFamily: 'var(--font-body)' }}
+          >
+            Estimates
+            {savedCount > 0 && (
+              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-500 tabular">
+                {savedCount}
+              </span>
+            )}
+          </button>
 
-        <PresetLoader onLoad={onLoadPreset} variant="light" />
-      </div>
+          <PresetLoader onLoad={onLoadPreset} variant="light" />
+        </div>
+      )}
     </div>
   )
 }

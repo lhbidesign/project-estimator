@@ -511,6 +511,12 @@ export default function App() {
           {estimatorContent}
         </div>
       </main>
+
+      {/* Pinned footer — print only, appears on every page */}
+      <div className="print-footer hidden" style={{ fontFamily: 'var(--font-body)' }}>
+        <span className="text-xs text-zinc-400">1616 N La Brea Ave Unit 302, Los Angeles, CA</span>
+        <span className="text-xs text-zinc-400">hello@littlehouse.studio</span>
+      </div>
     </div>
   )
 }

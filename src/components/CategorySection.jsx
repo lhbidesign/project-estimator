@@ -41,6 +41,18 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
             {!hideHours && <col className="w-20" />}
             <col className="w-32" />
           </colgroup>
+          <thead>
+            <tr className="border-b border-zinc-200">
+              <th className="pb-2 text-left text-xs font-black uppercase tracking-widest text-zinc-400"
+                style={{ fontFamily: 'var(--font-body)' }}>Description</th>
+              {!hideHours && (
+                <th className="pb-2 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
+                  style={{ fontFamily: 'var(--font-body)' }}>Hours</th>
+              )}
+              <th className="pb-2 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
+                style={{ fontFamily: 'var(--font-body)' }}>Cost</th>
+            </tr>
+          </thead>
           <tbody>
             {section.items.map(item => (
               <LineItemRow
@@ -74,7 +86,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
             value={section.label}
             onChange={e => onChange({ ...section, label: e.target.value })}
             placeholder="Section / Program name"
-            className="focus-light bg-transparent text-xs font-black uppercase tracking-widest text-zinc-600 outline-none placeholder-zinc-300 focus:text-zinc-900 flex-1"
+            className="focus-light bg-transparent text-xs font-black uppercase tracking-widest text-zinc-600 outline-none placeholder-zinc-400 focus:text-zinc-900 flex-1"
             style={{ fontFamily: 'var(--font-body)' }}
           />
           <button

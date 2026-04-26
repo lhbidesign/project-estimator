@@ -44,4 +44,17 @@
   body         { background: #fff !important; }
   nav          { display: none !important; }
   main         { padding-top: 0 !important; }
+
+  .print-footer {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 64px;
+    border-top: 1px solid #e4e4e7;
+    background: #fff;
+    justify-content: space-between;
+    align-items: center;
+  }
 }

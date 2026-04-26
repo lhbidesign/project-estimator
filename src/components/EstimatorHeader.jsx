@@ -4,6 +4,22 @@ const PAGES = [
   { id: 'rate-card', label: 'Rate Card' },
 ]
 
+function LightningBolt() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="#CCFF00"
+      className="w-auto flex-shrink-0"
+      style={{
+        height: '35px',
+        filter: 'drop-shadow(0 0 6px #CCFF00) drop-shadow(0 0 16px rgba(204,255,0,0.45))',
+      }}
+    >
+      <path d="M10.5 2 L3 13.5 H9 L7.5 22 L21 10.5 H15 L18 2 Z" />
+    </svg>
+  )
+}
+
 function GearIcon() {
   return (
     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -30,12 +46,7 @@ export default function EstimatorHeader({ page, setPage, onOpenSettings }) {
         className="flex items-center gap-2.5 flex-shrink-0 focus-light rounded-lg px-1 -mx-1 hover:opacity-80 transition-opacity"
         aria-label="Go to Estimator"
       >
-        <img
-          src={`${import.meta.env.BASE_URL}lh-logo.png`}
-          alt="Little House"
-          className="h-11 w-auto"
-          style={{ filter: 'brightness(0) invert(1)' }}
-        />
+        <LightningBolt />
         <span className="text-white font-extrabold text-xl tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
           Studio
         </span>

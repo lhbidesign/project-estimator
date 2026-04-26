@@ -7,6 +7,8 @@ const GM = {
   red:    { bg: 'bg-red-50',    border: 'border-red-200',   num: 'text-red-700',    label: 'Below Target' },
 }
 
+const PM_OPTIONS = [0, 10, 15, 20]
+
 export default function SummaryPanel({ sections, pmPercent, setPmPercent, view }) {
   const { resources, pmRate } = useRates()
   const p  = calcProject(sections, pmPercent, resources, pmRate)
@@ -17,8 +19,10 @@ export default function SummaryPanel({ sections, pmPercent, setPmPercent, view }
     return (
       <div className="mt-6 pt-6 border-t-2 border-zinc-200">
         <div className="max-w-xs ml-auto space-y-2">
-          <SRow label="Subtotal"                              value={fmt(p.subtotal)} />
-          <SRow label={`Project Management (${pmPercent}%)`} value={fmt(p.pmBilled)} />
+          <SRow label="Subtotal" value={fmt(p.subtotal)} />
+          {pmPercent > 0 && (
+            <SRow label={`Project Management (${pmPercent}%)`} value={fmt(p.pmBilled)} />
+          )}
           <div className="pt-3 mt-3 border-t border-zinc-200">
             <SRow label="Total" value={fmt(p.totalBilled)} strong />
           </div>
@@ -41,21 +45,24 @@ export default function SummaryPanel({ sections, pmPercent, setPmPercent, view }
           <p className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4"
             style={{ fontFamily: 'var(--font-body)' }}>PM Overhead</p>
           <div className="flex gap-1.5 bg-zinc-100 rounded-lg p-1 mb-5">
-            {[10, 15, 20].map(pct => (
-              <button key={pct} onClick={() => setPmPercent(pct)}
+            {PM_OPTIONS.map(pct => (
+              <button
+                key={pct}
+                onClick={() => setPmPercent(pct)}
                 className={`flex-1 py-2 rounded-md text-xs font-bold transition-all focus-light ${
                   pmPercent === pct ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'
                 }`}
                 style={{ fontFamily: 'var(--font-body)' }}
-                aria-pressed={pmPercent === pct}>
-                {pct}%
+                aria-pressed={pmPercent === pct}
+              >
+                {pct === 0 ? 'None' : `${pct}%`}
               </button>
             ))}
           </div>
           <div className="space-y-2">
-            <PRow label="Est. PM hours" value={`${p.pmHours.toFixed(1)} hrs`} />
-            <PRow label="PM cost (Dee)"  value={fmt(p.pmInternal)} dim />
-            <PRow label="PM billed"      value={fmt(p.pmBilled)} />
+            <PRow label="Est. PM hours" value={pmPercent > 0 ? `${p.pmHours.toFixed(1)} hrs` : '—'} />
+            <PRow label="PM cost (Dee)"  value={pmPercent > 0 ? fmt(p.pmInternal) : '—'} dim />
+            <PRow label="PM billed"      value={pmPercent > 0 ? fmt(p.pmBilled) : '—'} />
           </div>
         </div>
 
@@ -64,13 +71,13 @@ export default function SummaryPanel({ sections, pmPercent, setPmPercent, view }
           <p className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4"
             style={{ fontFamily: 'var(--font-body)' }}>Financials</p>
           <div className="space-y-2">
-            <PRow label="Designer cost"   value={fmt(p.designerInternal)} dim />
-            <PRow label="PM cost"         value={fmt(p.pmInternal)} dim />
+            <PRow label="Designer cost"    value={fmt(p.designerInternal)} dim />
+            <PRow label="PM cost"          value={fmt(p.pmInternal)} dim />
             <div className="border-t border-zinc-100 pt-2 mt-2">
               <PRow label="Total internal cost" value={fmt(p.totalInternal)} />
             </div>
             <PRow label="Subtotal (pre-PM)"      value={fmt(p.subtotal)} />
-            <PRow label="PM overhead"            value={fmt(p.pmBilled)} />
+            {pmPercent > 0 && <PRow label="PM overhead" value={fmt(p.pmBilled)} />}
             <div className="border-t border-zinc-100 pt-2 mt-2">
               <PRow label="Total billed to client" value={fmt(p.totalBilled)} strong />
             </div>

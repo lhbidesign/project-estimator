@@ -13,7 +13,7 @@ function buildSystemPrompt(resources, hourGuides, pmRate) {
     .map(([k, r]) => `  ${k}: ${r.label} — $${r.billedRate}/hr billed, $${r.internalRate}/hr internal`)
     .join('\n')
   const guideLines = hourGuides
-    .map(g => `  [${g.projectCategory}] ${g.name}: ${g.min}–${g.max} hrs (${resources[g.resource]?.label ?? g.resource})`)
+    .map(g => `  [${g.projectCategory}] ${g.name}: ~${g.hours} hrs`)
     .join('\n')
 
   return `You are an expert project estimator for Little House Studio, an experiential design agency specializing in brand activations and experiential events. Little House does NOT do print production.

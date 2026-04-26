@@ -4,7 +4,6 @@ import { calcSection, fmt } from '../utils/calc.js'
 import { useRates } from '../contexts/RatesContext.jsx'
 import { nanoid } from '../utils/nanoid.js'
 
-// Rendering items always go to Mostafa
 function defaultResource(categoryId, projectDesigner) {
   return categoryId === 'renderings' ? 'mostafa_general' : (projectDesigner || 'brandon')
 }
@@ -13,7 +12,7 @@ function newItem(categoryId, name, projectDesigner) {
   return { id: nanoid(), name, resource: defaultResource(categoryId, projectDesigner), hours: 8, category: categoryId }
 }
 
-export default function CategorySection({ section, view, onChange, onDeleteSection, isOnlySection, projectDesigner }) {
+export default function CategorySection({ section, view, onChange, onDeleteSection, isOnlySection, projectDesigner, hideHours }) {
   const { resources } = useRates()
   const totals = calcSection(section.items, resources)
 
@@ -37,10 +36,18 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
           </h3>
         )}
         <table className="w-full">
-          <colgroup><col /><col className="w-20" /><col className="w-32" /></colgroup>
+          <colgroup>
+            <col />
+            {!hideHours && <col className="w-20" />}
+            <col className="w-32" />
+          </colgroup>
           <tbody>
             {section.items.map(item => (
-              <LineItemRow key={item.id} item={item} view="client" onChange={() => {}} onDelete={() => {}} />
+              <LineItemRow
+                key={item.id} item={item} view="client"
+                onChange={() => {}} onDelete={() => {}}
+                hideHours={hideHours}
+              />
             ))}
           </tbody>
         </table>
@@ -60,8 +67,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
 
   /* ── INTERNAL VIEW ── */
   return (
-    <div className="mb-4 bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
-
+    <div className="mb-3 bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
       {!isOnlySection && (
         <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-100 bg-zinc-50 group/lbl">
           <input
@@ -85,15 +91,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
         <table className="w-full">
           <thead>
             <tr>
-              {[
-                ['Deliverable', 'pl-5 pr-3 text-left'],
-                ['Resource', 'pr-3 text-left'],
-                ['Hrs', 'pr-3 text-right w-20'],
-                ['Cost', 'pr-4 text-right'],
-                ['Billed', 'pr-4 text-right'],
-                ['GM%', 'pr-3 text-right'],
-                ['', 'pr-3 w-8'],
-              ].map(([h, cls]) => (
+              {[['Deliverable', 'pl-5 pr-3 text-left'], ['Resource', 'pr-3 text-left'], ['Hrs', 'pr-3 text-right w-20'], ['Cost', 'pr-4 text-right'], ['Billed', 'pr-4 text-right'], ['GM%', 'pr-3 text-right'], ['', 'pr-3 w-8']].map(([h, cls]) => (
                 <th key={h} className={`py-2.5 text-xs font-black uppercase tracking-wider text-zinc-400 ${cls}`}
                   style={{ fontFamily: 'var(--font-body)' }}>{h}</th>
               ))}
@@ -105,7 +103,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
       <table className="w-full">
         <tbody>
           {section.items.length === 0 ? (
-            <tr><td colSpan={7} className="pl-5 py-6 text-sm text-zinc-400 italic" style={{ fontFamily: 'var(--font-body)' }}>
+            <tr><td colSpan={7} className="pl-5 py-5 text-sm text-zinc-400 italic" style={{ fontFamily: 'var(--font-body)' }}>
               Add a deliverable below
             </td></tr>
           ) : section.items.map(item => (
@@ -136,35 +134,24 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
           onChange={e => { if (!e.target.value) return; const [c, n] = e.target.value.split('||'); addItem(c, n); e.target.value = '' }}
           className="focus-light text-xs font-bold text-zinc-500 hover:text-zinc-900 border border-zinc-200 hover:border-zinc-400 rounded-lg px-3 py-1.5 bg-white cursor-pointer outline-none transition-colors"
           style={{ fontFamily: 'var(--font-body)' }}
-          aria-label="Add deliverable"
         >
           <option value="" disabled>+ Add deliverable…</option>
           {CATEGORIES.map(cat => (
             <optgroup key={cat.id} label={cat.label}>
-              {cat.deliverables.map(d => (
-                <option key={d} value={`${cat.id}||${d}`}>{d}</option>
-              ))}
+              {cat.deliverables.map(d => <option key={d} value={`${cat.id}||${d}`}>{d}</option>)}
             </optgroup>
           ))}
         </select>
-
         <span className="text-zinc-200 text-xs">or</span>
-
         <button onClick={() => addBlock('General Design Hours', projectDesigner || 'brandon', 'graphic_design', 40)}
           className="focus-light text-xs font-bold text-zinc-500 hover:text-zinc-900 border border-zinc-200 hover:border-zinc-400 rounded-lg px-3 py-1.5 transition-colors"
-          style={{ fontFamily: 'var(--font-body)' }}>
-          + Design Block
-        </button>
+          style={{ fontFamily: 'var(--font-body)' }}>+ Design Block</button>
         <button onClick={() => addBlock('General Rendering Hours', 'mostafa_general', 'renderings', 20)}
           className="focus-light text-xs font-bold text-zinc-500 hover:text-zinc-900 border border-zinc-200 hover:border-zinc-400 rounded-lg px-3 py-1.5 transition-colors"
-          style={{ fontFamily: 'var(--font-body)' }}>
-          + Rendering Block
-        </button>
+          style={{ fontFamily: 'var(--font-body)' }}>+ Rendering Block</button>
         <button onClick={() => addBlock('On-Call / Rush Hours', 'mostafa_oncall', 'renderings', 10)}
           className="focus-light text-xs font-bold text-zinc-500 hover:text-zinc-900 border border-zinc-200 hover:border-zinc-400 rounded-lg px-3 py-1.5 transition-colors"
-          style={{ fontFamily: 'var(--font-body)' }}>
-          + On-Call Block
-        </button>
+          style={{ fontFamily: 'var(--font-body)' }}>+ On-Call Block</button>
       </div>
     </div>
   )

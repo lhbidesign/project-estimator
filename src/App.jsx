@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import EstimatorHeader  from './components/EstimatorHeader.jsx'
+import ViewToggleBar    from './components/ViewToggleBar.jsx'
 import ProjectMeta      from './components/ProjectMeta.jsx'
 import BudgetCalculator from './components/BudgetCalculator.jsx'
 import CategorySection  from './components/CategorySection.jsx'
@@ -8,6 +9,7 @@ import RateCardPage     from './components/RateCardPage.jsx'
 import AIGeneratePage   from './components/AIGeneratePage.jsx'
 import SettingsPage     from './components/SettingsPage.jsx'
 import EstimatesDrawer  from './components/EstimatesDrawer.jsx'
+import { useHistory }   from './hooks/useHistory.js'
 import { nanoid }       from './utils/nanoid.js'
 import { calcProject }  from './utils/calc.js'
 import { useRates }     from './contexts/RatesContext.jsx'
@@ -16,50 +18,67 @@ import { DEFAULT_CLIENTS } from './data/clients.js'
 const ESTIMATES_KEY = 'lh-estimates'
 
 function loadStoredEstimates() {
-  try { return JSON.parse(localStorage.getItem(ESTIMATES_KEY) ?? '[]') }
-  catch { return [] }
+  try { return JSON.parse(localStorage.getItem(ESTIMATES_KEY) ?? '[]') } catch { return [] }
 }
 
-function blankSection() {
-  return { id: nanoid(), label: '', items: [] }
-}
+function blankSection() { return { id: nanoid(), label: '', items: [] } }
 
 export default function App() {
   const { resources, pmRate } = useRates()
 
-  const [page,            setPage]            = useState('estimator')
-  const [view,            setView]            = useState('internal')
-  const [historyOpen,     setHistoryOpen]     = useState(false)
-  const [justSaved,       setJustSaved]       = useState(false)
-  const [savedEstimates,  setSavedEstimates]  = useState(loadStoredEstimates)
+  const [page,           setPage]           = useState('estimator')
+  const [view,           setView]           = useState('internal')
+  const [historyOpen,    setHistoryOpen]    = useState(false)
+  const [justSaved,      setJustSaved]      = useState(false)
+  const [savedEstimates, setSavedEstimates] = useState(loadStoredEstimates)
+  const [currentEstimateId, setCurrentEstimateId] = useState(null)
 
-  // Project state
+  // Project fields
   const [projectName,     setProjectName]     = useState('')
   const [clients,         setClients]         = useState(DEFAULT_CLIENTS)
   const [clientId,        setClientId]        = useState('')
   const [contact,         setContact]         = useState('')
   const [projectDesigner, setProjectDesigner] = useState('stef')
   const [pmPercent,       setPmPercent]       = useState(15)
-  const [sections,        setSections]        = useState([blankSection()])
+  const [hideHours,       setHideHours]       = useState(false)
+
+  // Undo/redo for sections
+  const { sections, push, undo, redo, canUndo, canRedo, reset: resetHistory } = useHistory([blankSection()])
+
+  function setSections(updater) {
+    const next = typeof updater === 'function' ? updater(sections) : updater
+    push(next)
+  }
+
+  // Keyboard shortcuts: Cmd+Z / Cmd+Shift+Z
+  useEffect(() => {
+    function handleKey(e) {
+      if (!e.metaKey && !e.ctrlKey) return
+      if (e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo() }
+      if ((e.key === 'z' && e.shiftKey) || e.key === 'y') { e.preventDefault(); redo() }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [undo, redo])
 
   const clientName = clients.find(c => c.id === clientId)?.name ?? ''
 
-  // ── Estimate persistence ──
+  // ── Save / Load ──
   function saveEstimate() {
     const p = calcProject(sections, pmPercent, resources, pmRate)
     const est = {
-      id: nanoid(),
+      id: currentEstimateId ?? nanoid(),
       savedAt: new Date().toISOString(),
-      projectName,
-      clientId,
-      clientName,
-      contact,
-      projectDesigner,
-      pmPercent,
-      sections,
+      projectName, clientId, clientName, contact, projectDesigner, pmPercent, sections,
       totalBilled: p.totalBilled,
     }
-    const updated = [est, ...savedEstimates].slice(0, 50)
+    let updated
+    if (currentEstimateId) {
+      updated = savedEstimates.map(e => e.id === currentEstimateId ? est : e)
+    } else {
+      setCurrentEstimateId(est.id)
+      updated = [est, ...savedEstimates].slice(0, 50)
+    }
     setSavedEstimates(updated)
     localStorage.setItem(ESTIMATES_KEY, JSON.stringify(updated))
     setJustSaved(true)
@@ -67,12 +86,12 @@ export default function App() {
   }
 
   function loadEstimate(est) {
+    const newSections = (est.sections ?? [blankSection()]).map(s => ({ ...s, id: nanoid() }))
+    resetHistory(newSections)
     setProjectName(est.projectName ?? '')
     setContact(est.contact ?? '')
     setProjectDesigner(est.projectDesigner ?? 'stef')
     setPmPercent(est.pmPercent ?? 15)
-    setSections((est.sections ?? [blankSection()]).map(s => ({ ...s, id: nanoid() })))
-    // Restore or register client
     if (est.clientId && clients.find(c => c.id === est.clientId)) {
       setClientId(est.clientId)
     } else if (est.clientName) {
@@ -87,6 +106,7 @@ export default function App() {
     } else {
       setClientId('')
     }
+    setCurrentEstimateId(est.id)
     setHistoryOpen(false)
     setPage('estimator')
   }
@@ -97,11 +117,24 @@ export default function App() {
     localStorage.setItem(ESTIMATES_KEY, JSON.stringify(updated))
   }
 
-  // ── Preset / AI apply ──
+  function resetEstimate() {
+    if (!confirm('Start a new estimate? All current data will be cleared.')) return
+    setProjectName('')
+    setClientId('')
+    setContact('')
+    setProjectDesigner('stef')
+    setPmPercent(15)
+    setHideHours(false)
+    resetHistory([blankSection()])
+    setCurrentEstimateId(null)
+  }
+
+  // ── Preset / AI ──
   function loadPreset(preset) {
+    const newSections = preset.sections.map(s => ({ ...s, id: nanoid() }))
+    resetHistory(newSections)
     setProjectName(preset.projectName)
     setPmPercent(preset.pmPercent)
-    setSections(preset.sections.map(s => ({ ...s, id: nanoid() })))
     const match = clients.find(c => c.name === preset.clientName)
     if (match) {
       setClientId(match.id)
@@ -111,9 +144,11 @@ export default function App() {
       setClientId(id)
     }
     setContact('')
+    setCurrentEstimateId(null)
   }
 
   function applyGenerated(data) {
+    if (data.sections?.length) resetHistory(data.sections)
     if (data.projectName) setProjectName(data.projectName)
     if (data.clientName) {
       const match = clients.find(c => c.name === data.clientName)
@@ -125,31 +160,29 @@ export default function App() {
         setClientId(id)
       }
     }
-    if (data.sections?.length) setSections(data.sections)
+    setCurrentEstimateId(null)
     setPage('estimator')
   }
 
-  // ── Section management ──
-  function updateSection(id, u) { setSections(prev => prev.map(s => s.id === id ? u : s)) }
-  function deleteSection(id)    { setSections(prev => prev.length > 1 ? prev.filter(s => s.id !== id) : prev) }
-  function addSection()         { setSections(prev => [...prev, blankSection()]) }
+  // ── Section helpers ──
+  function updateSection(id, u)  { setSections(prev => prev.map(s => s.id === id ? u : s)) }
+  function deleteSection(id)     { setSections(prev => prev.length > 1 ? prev.filter(s => s.id !== id) : prev) }
+  function addSection()          { setSections(prev => [...prev, blankSection()]) }
   function addItemsToFirst(items) {
-    setSections(prev => {
-      const [first, ...rest] = prev
-      return [{ ...first, items: [...first.items, ...items] }, ...rest]
-    })
+    setSections(prev => { const [f, ...r] = prev; return [{ ...f, items: [...f.items, ...items] }, ...r] })
+  }
+
+  // ── Header props ──
+  const headerProps = {
+    page, setPage,
+    onLoadPreset: loadPreset,
+    onOpenHistory: () => setHistoryOpen(true),
+    savedCount: savedEstimates.length,
+    onUndo: undo, onRedo: redo, canUndo, canRedo,
+    onOpenSettings: () => setPage('settings'),
   }
 
   // ── Non-estimator pages ──
-  const headerProps = {
-    page, setPage, view, setView,
-    onLoadPreset: loadPreset,
-    onSave: saveEstimate,
-    justSaved,
-    savedCount: savedEstimates.length,
-    onOpenHistory: () => setHistoryOpen(true),
-  }
-
   if (page === 'rate-card') return (
     <>
       <EstimatorHeader {...headerProps} />
@@ -169,20 +202,45 @@ export default function App() {
     </>
   )
 
-  // ── Shared estimator content ──
+  // ── Project meta props ──
+  const metaProps = {
+    projectName, setProjectName,
+    clients, setClients,
+    clientId, setClientId,
+    contact, setContact,
+    projectDesigner, setProjectDesigner,
+    hideHours, setHideHours,
+    onSave: saveEstimate,
+    justSaved,
+    onReset: resetEstimate,
+  }
+
+  // ── ESTIMATOR — shared content ──
   const estimatorContent = (
     <>
-      {sections.map(section => (
-        <CategorySection
-          key={section.id}
-          section={section}
-          view={view}
-          projectDesigner={projectDesigner}
-          onChange={u => updateSection(section.id, u)}
-          onDeleteSection={() => deleteSection(section.id)}
-          isOnlySection={sections.length === 1}
-        />
-      ))}
+      <div>
+        {sections.map(section => (
+          <CategorySection
+            key={section.id}
+            section={section}
+            view={view}
+            projectDesigner={projectDesigner}
+            hideHours={hideHours}
+            onChange={u => updateSection(section.id, u)}
+            onDeleteSection={() => deleteSection(section.id)}
+            isOnlySection={sections.length === 1}
+          />
+        ))}
+        {/* Add section — grouped with deliverable cards */}
+        <button
+          onClick={addSection}
+          className="focus-light w-full text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-700 transition-colors border border-dashed border-zinc-200 hover:border-zinc-400 rounded-xl px-4 py-3 mb-6"
+          style={{ fontFamily: 'var(--font-body)' }}
+        >
+          + Add program / section
+        </button>
+      </div>
+
       <SummaryPanel
         sections={sections}
         pmPercent={pmPercent}
@@ -197,38 +255,19 @@ export default function App() {
     return (
       <div className="min-h-screen" style={{ background: 'var(--page-bg)' }}>
         <EstimatorHeader {...headerProps} />
+        <ViewToggleBar view={view} setView={setView} />
 
-        <main className="pt-[68px]">
+        <main className="pt-[120px]">
           <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
-            <ProjectMeta
-              projectName={projectName}         setProjectName={setProjectName}
-              clients={clients}                 setClients={setClients}
-              clientId={clientId}               setClientId={setClientId}
-              contact={contact}                 setContact={setContact}
-              projectDesigner={projectDesigner} setProjectDesigner={setProjectDesigner}
-            />
-
-            <BudgetCalculator
-              pmPercent={pmPercent}
-              projectDesigner={projectDesigner}
-              onAddItems={addItemsToFirst}
-            />
-
+            <ProjectMeta {...metaProps} />
+            <BudgetCalculator pmPercent={pmPercent} projectDesigner={projectDesigner} onAddItems={addItemsToFirst} />
             {estimatorContent}
-
-            <button
-              onClick={addSection}
-              className="focus-light mt-3 mb-6 text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-700 transition-colors border border-dashed border-zinc-300 hover:border-zinc-500 rounded-lg px-4 py-2.5 w-full"
-              style={{ fontFamily: 'var(--font-body)' }}
-            >
-              + Add program / section
-            </button>
           </div>
         </main>
 
         <footer className="border-t border-zinc-200 py-4 mt-8">
           <div className="max-w-[1400px] mx-auto px-8 lg:px-16 flex justify-between items-center">
-            <span className="text-xs text-zinc-400 font-medium" style={{ fontFamily: 'var(--font-body)' }}>
+            <span className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
               Little House Studio — Internal use only
             </span>
             <span className="text-xs text-zinc-400 tabular" style={{ fontFamily: 'var(--font-body)' }}>
@@ -252,23 +291,21 @@ export default function App() {
   return (
     <div className="min-h-screen bg-white">
       <EstimatorHeader {...headerProps} />
+      <ViewToggleBar view={view} setView={setView} />
 
       <div className="hidden print-show pt-8 pb-6 border-b border-zinc-200 px-16">
-        <p className="text-xs font-black uppercase tracking-widest mb-1"
-          style={{ color: '#4e6300', fontFamily: 'var(--font-body)' }}>
+        <p className="text-xs font-black uppercase tracking-widest mb-1" style={{ color: '#4e6300', fontFamily: 'var(--font-body)' }}>
           Little House Studio
         </p>
         <h1 className="text-2xl font-black text-zinc-900" style={{ fontFamily: 'var(--font-display)' }}>
           {projectName || 'Project Estimate'}
         </h1>
         {(clientName || contact) && (
-          <p className="text-zinc-500 text-sm mt-0.5">
-            {[clientName, contact].filter(Boolean).join(' · ')}
-          </p>
+          <p className="text-zinc-500 text-sm mt-0.5">{[clientName, contact].filter(Boolean).join(' · ')}</p>
         )}
       </div>
 
-      <main className="pt-[68px]">
+      <main className="pt-[120px]">
         <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
           <div className="no-print mb-10 pb-8 border-b border-zinc-100 flex justify-between items-start gap-6 flex-wrap">
             <div>
@@ -276,8 +313,7 @@ export default function App() {
                 style={{ color: '#4e6300', fontFamily: 'var(--font-body)' }}>
                 Little House Studio
               </p>
-              <h1 className="text-4xl font-black text-zinc-900 leading-tight"
-                style={{ fontFamily: 'var(--font-display)' }}>
+              <h1 className="text-4xl font-black text-zinc-900 leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
                 {projectName || 'Project Estimate'}
               </h1>
               {(clientName || contact) && (
@@ -299,7 +335,6 @@ export default function App() {
               </button>
             </div>
           </div>
-
           {estimatorContent}
         </div>
       </main>

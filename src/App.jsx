@@ -196,10 +196,15 @@ export default function App() {
   // ── Header props ──
   const headerProps = {
     page, setPage,
-    onLoadPreset: loadPreset,
-    onOpenHistory: () => setHistoryOpen(true),
-    savedCount: savedEstimates.length,
     onOpenSettings: () => setPage('settings'),
+  }
+
+  // ── Toggle bar props (estimator page only) ──
+  const toggleBarProps = {
+    view, setView,
+    onOpenEstimates: () => setHistoryOpen(true),
+    savedCount: savedEstimates.length,
+    onLoadPreset: loadPreset,
   }
 
   // ── Non-estimator pages ──
@@ -277,7 +282,7 @@ export default function App() {
     return (
       <div className="min-h-screen" style={{ background: 'var(--page-bg)' }}>
         <EstimatorHeader {...headerProps} />
-        <ViewToggleBar view={view} setView={setView} />
+        <ViewToggleBar {...toggleBarProps} />
 
         <main className="pt-[140px]">
           <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">

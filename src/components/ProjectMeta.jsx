@@ -75,14 +75,14 @@ export default function ProjectMeta({
         {/* Undo / Redo */}
         <button
           onClick={onUndo} disabled={!canUndo}
-          className="focus-light w-7 h-7 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+          className="focus-light w-8 h-8 rounded-lg flex items-center justify-center border border-zinc-300 bg-white text-zinc-700 hover:text-zinc-950 hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
           aria-label="Undo" title="Undo (⌘Z)"
         >
           <UndoIcon />
         </button>
         <button
           onClick={onRedo} disabled={!canRedo}
-          className="focus-light w-7 h-7 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+          className="focus-light w-8 h-8 rounded-lg flex items-center justify-center border border-zinc-300 bg-white text-zinc-700 hover:text-zinc-950 hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
           aria-label="Redo" title="Redo (⌘⇧Z)"
         >
           <RedoIcon />

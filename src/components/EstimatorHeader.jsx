@@ -1,5 +1,3 @@
-import PresetLoader from './PresetLoader.jsx'
-
 const PAGES = [
   { id: 'estimator', label: 'Estimator' },
   { id: 'generate',  label: 'Generate'  },
@@ -15,12 +13,7 @@ function GearIcon() {
   )
 }
 
-export default function EstimatorHeader({
-  page, setPage,
-  onLoadPreset,
-  onOpenHistory, savedCount,
-  onOpenSettings,
-}) {
+export default function EstimatorHeader({ page, setPage, onOpenSettings }) {
   return (
     <nav
       className="no-print fixed top-0 w-full z-50 flex items-center justify-between px-8 h-[68px]"
@@ -79,25 +72,6 @@ export default function EstimatorHeader({
 
       {/* Right controls */}
       <div className="flex items-center gap-1 flex-shrink-0">
-        {page === 'estimator' && (
-          <>
-            <button
-              onClick={onOpenHistory}
-              className="flex items-center gap-1.5 text-white/50 hover:text-white text-xs font-bold uppercase tracking-wider transition-colors px-3 py-1.5 rounded-lg hover:bg-white/10"
-              style={{ fontFamily: 'var(--font-body)' }}
-            >
-              History
-              {savedCount > 0 && (
-                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-white/10 text-white/60 tabular">
-                  {savedCount}
-                </span>
-              )}
-            </button>
-            <PresetLoader onLoad={onLoadPreset} />
-            <div className="w-px h-4 bg-white/10 mx-1" />
-          </>
-        )}
-
         <button
           onClick={onOpenSettings}
           className={`focus-light w-8 h-8 rounded-lg flex items-center justify-center transition-all ${

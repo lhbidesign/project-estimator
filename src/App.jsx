@@ -47,6 +47,7 @@ export default function App() {
   const [estimateDate,    setEstimateDate]    = useState(() => new Date().toISOString().slice(0, 10))
   const [estimateNumber,  setEstimateNumber]  = useState(null)
   const [clientAddress,   setClientAddress]   = useState('')
+  const [validDays,       setValidDays]       = useState(30)
 
   // Undo/redo for sections
   const { sections, push, undo, redo, canUndo, canRedo, reset: resetHistory } = useHistory([blankSection()])
@@ -112,7 +113,7 @@ export default function App() {
       id: currentEstimateId ?? nanoid(),
       savedAt: new Date().toISOString(),
       estimateNumber: num,
-      estimateDate,
+      estimateDate, validDays,
       projectName, clientId, clientName, contact, clientAddress, projectDesigner, pmPercent, sections,
       totalBilled: p.totalBilled,
     }
@@ -140,6 +141,7 @@ export default function App() {
     setEstimateDate(est.estimateDate ?? new Date().toISOString().slice(0, 10))
     setEstimateNumber(est.estimateNumber ?? null)
     setClientAddress(est.clientAddress ?? '')
+    setValidDays(est.validDays ?? 30)
     if (est.clientId && clients.find(c => c.id === est.clientId)) {
       setClientId(est.clientId)
     } else if (est.clientName) {
@@ -175,6 +177,7 @@ export default function App() {
     setPmPercent(15)
     setHideHours(false)
     setClientAddress('')
+    setValidDays(30)
     setEstimateDate(new Date().toISOString().slice(0, 10))
     setEstimateNumber(null)
     resetHistory([blankSection()])
@@ -269,6 +272,7 @@ export default function App() {
     clientAddress, setClientAddress,
     estimateDate, setEstimateDate,
     estimateNumber,
+    validDays, setValidDays,
     onSave: saveEstimate, justSaved, saveError,
     onReset: resetEstimate,
     onUndo: undo, onRedo: redo, canUndo, canRedo,
@@ -351,6 +355,11 @@ export default function App() {
     ? new Date(estimateDate + 'T12:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 
+  const expiryDate = estimateDate
+    ? new Date(new Date(estimateDate + 'T12:00:00').getTime() + validDays * 864e5)
+        .toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : null
+
   return (
     <div className="min-h-screen bg-white">
       <EstimatorHeader {...headerProps} />
@@ -359,7 +368,6 @@ export default function App() {
       {/* ── Print-only header ── */}
       <div className="hidden print-show px-16 pt-10 pb-8 border-b-2 border-zinc-200">
         <div className="flex items-start justify-between gap-8">
-          {/* Left: project + client info */}
           <div className="flex-1">
             <h1 className="text-3xl font-black text-zinc-900 leading-tight mb-2"
               style={{ fontFamily: 'var(--font-display)' }}>
@@ -378,13 +386,20 @@ export default function App() {
             <p className="text-zinc-400 text-xs mt-3 font-mono">
               {[estimateNumber, formattedDate].filter(Boolean).join(' · ')}
             </p>
+            {expiryDate && (
+              <p className="text-zinc-400 text-xs mt-0.5" style={{ fontFamily: 'var(--font-body)' }}>
+                Valid through {expiryDate}
+              </p>
+            )}
           </div>
-          {/* Right: studio logo */}
-          <img
-            src={`${import.meta.env.BASE_URL}lhbi-logo.png`}
-            alt="Little House Studio"
-            className="h-20 w-auto object-contain flex-shrink-0"
-          />
+          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+            <img src={`${import.meta.env.BASE_URL}lhbi-logo.png`} alt="Little House Studio"
+              className="h-24 w-auto object-contain" />
+            <p className="text-zinc-300 text-xs font-bold tracking-[0.25em] uppercase"
+              style={{ fontFamily: 'var(--font-display)' }}>
+              Estimate
+            </p>
+          </div>
         </div>
       </div>
 
@@ -414,15 +429,26 @@ export default function App() {
                 <p className="text-zinc-400 text-xs mt-3 font-mono">
                   {[estimateNumber, formattedDate].filter(Boolean).join(' · ')}
                 </p>
+                {expiryDate && (
+                  <p className="text-zinc-400 text-xs mt-0.5" style={{ fontFamily: 'var(--font-body)' }}>
+                    Valid through {expiryDate}
+                  </p>
+                )}
               </div>
 
-              {/* Right: large studio logo + print button */}
-              <div className="flex flex-col items-end gap-4 flex-shrink-0">
-                <img
-                  src={`${import.meta.env.BASE_URL}lhbi-logo.png`}
-                  alt="Little House Studio"
-                  className="h-20 w-auto object-contain"
-                />
+              {/* Right: logo + ESTIMATE label + print */}
+              <div className="flex flex-col items-end gap-3 flex-shrink-0">
+                <div className="flex flex-col items-end gap-1.5">
+                  <img
+                    src={`${import.meta.env.BASE_URL}lhbi-logo.png`}
+                    alt="Little House Studio"
+                    className="h-24 w-auto object-contain"
+                  />
+                  <p className="text-zinc-300 text-xs font-bold tracking-[0.25em] uppercase"
+                    style={{ fontFamily: 'var(--font-display)' }}>
+                    Estimate
+                  </p>
+                </div>
                 <button
                   onClick={() => window.print()}
                   className="focus-light px-4 py-2 border border-zinc-300 text-zinc-500 text-xs font-bold uppercase tracking-widest hover:border-zinc-900 hover:text-zinc-900 transition-all rounded-lg"

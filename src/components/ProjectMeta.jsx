@@ -38,6 +38,7 @@ export default function ProjectMeta({
   hideHours, setHideHours,
   estimateDate, setEstimateDate,
   estimateNumber,
+  validDays, setValidDays,
   onSave, justSaved, saveError,
   onReset,
   onUndo, onRedo, canUndo, canRedo,
@@ -218,6 +219,28 @@ export default function ProjectMeta({
             className="focus-light border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-700 bg-white outline-none focus:border-zinc-900 cursor-pointer"
             style={{ fontFamily: 'var(--font-body)' }}
           />
+        </div>
+
+        {/* Validity period */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
+            style={{ fontFamily: 'var(--font-body)' }}>Valid</span>
+          <div className="flex gap-1">
+            {[7, 14, 30].map(d => (
+              <button
+                key={d}
+                onClick={() => setValidDays(d)}
+                className={`focus-light px-2.5 py-1 rounded-md text-xs font-bold transition-all ${
+                  validDays === d
+                    ? 'bg-zinc-900 text-white'
+                    : 'text-zinc-400 hover:text-zinc-700 border border-zinc-200 hover:border-zinc-400 bg-white'
+                }`}
+                style={{ fontFamily: 'var(--font-body)' }}
+              >
+                {d}d
+              </button>
+            ))}
+          </div>
         </div>
 
         <span className="text-zinc-200 text-sm hidden lg:block">|</span>

@@ -293,14 +293,16 @@ export default function App() {
             isOnlySection={sections.length === 1}
           />
         ))}
-        {/* Add section — grouped with deliverable cards */}
-        <button
-          onClick={addSection}
-          className="focus-light w-full text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-700 transition-colors border border-dashed border-zinc-200 hover:border-zinc-400 rounded-xl px-4 py-3 mb-6"
-          style={{ fontFamily: 'var(--font-body)' }}
-        >
-          + Add program / section
-        </button>
+        {/* Add section — internal only */}
+        {view === 'internal' && (
+          <button
+            onClick={addSection}
+            className="focus-light w-full text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-700 transition-colors border border-dashed border-zinc-200 hover:border-zinc-400 rounded-xl px-4 py-3 mb-6"
+            style={{ fontFamily: 'var(--font-body)' }}
+          >
+            + Add program / section
+          </button>
+        )}
       </div>
 
       <SummaryPanel
@@ -401,24 +403,6 @@ export default function App() {
     <div className="min-h-screen bg-white">
       <EstimatorHeader {...headerProps} />
       <ViewToggleBar view={view} setView={setView} />
-
-      {/* ── Print-only footer note + company info ── */}
-      {footerNote && (
-        <div className="hidden print-show px-16 pt-6 pb-2">
-          <p className="text-xs text-zinc-500 leading-relaxed border-t border-zinc-100 pt-5"
-            style={{ fontFamily: 'var(--font-body)' }}>
-            {footerNote}
-          </p>
-        </div>
-      )}
-      <div className="hidden print-show px-16 pb-8 flex items-center justify-between border-t border-zinc-100 pt-4">
-        <p className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
-          1616 N La Brea Ave Unit 302, Los Angeles, CA
-        </p>
-        <p className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
-          hello@littlehouse.studio
-        </p>
-      </div>
 
       {/* ── Print-only header ── */}
       <div className="hidden print-show px-16 pt-10 pb-8 border-b-2 border-zinc-200">

@@ -48,6 +48,7 @@ export default function App() {
   const [estimateNumber,  setEstimateNumber]  = useState(null)
   const [clientAddress,   setClientAddress]   = useState('')
   const [validDays,       setValidDays]       = useState(30)
+  const [footerNote,      setFooterNote]      = useState('50% deposit required to initiate project. Balance due upon completion unless otherwise agreed upon in writing.')
 
   // Undo/redo for sections
   const { sections, push, undo, redo, canUndo, canRedo, reset: resetHistory } = useHistory([blankSection()])
@@ -113,7 +114,7 @@ export default function App() {
       id: currentEstimateId ?? nanoid(),
       savedAt: new Date().toISOString(),
       estimateNumber: num,
-      estimateDate, validDays,
+      estimateDate, validDays, footerNote,
       projectName, clientId, clientName, contact, clientAddress, projectDesigner, pmPercent, sections,
       totalBilled: p.totalBilled,
     }
@@ -142,6 +143,7 @@ export default function App() {
     setEstimateNumber(est.estimateNumber ?? null)
     setClientAddress(est.clientAddress ?? '')
     setValidDays(est.validDays ?? 30)
+    setFooterNote(est.footerNote ?? '50% deposit required to initiate project. Balance due upon completion unless otherwise agreed upon in writing.')
     // Prefer matching by stable ID, fall back to name match
     if (est.clientId && clients.find(c => c.id === est.clientId)) {
       setClientId(est.clientId)
@@ -170,6 +172,7 @@ export default function App() {
     setHideHours(false)
     setClientAddress('')
     setValidDays(30)
+    setFooterNote('50% deposit required to initiate project. Balance due upon completion unless otherwise agreed upon in writing.')
     setEstimateDate(new Date().toISOString().slice(0, 10))
     setEstimateNumber(null)
     resetHistory([blankSection()])
@@ -300,6 +303,44 @@ export default function App() {
         setPmPercent={setPmPercent}
         view={view}
       />
+
+      {/* Footer note — editable in internal, display-only in client */}
+      {view === 'internal' ? (
+        <div className="mt-8 pt-6 border-t border-zinc-200">
+          <label className="block text-xs font-black uppercase tracking-widest text-zinc-400 mb-2"
+            style={{ fontFamily: 'var(--font-body)' }}>
+            Terms / Footer Note
+          </label>
+          <textarea
+            value={footerNote}
+            onChange={e => setFooterNote(e.target.value)}
+            rows={2}
+            className="focus-light w-full text-sm text-zinc-600 bg-white border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:border-zinc-900 resize-y shadow-sm placeholder-zinc-300 leading-relaxed"
+            style={{ fontFamily: 'var(--font-body)' }}
+            placeholder="Add payment terms, notes, or conditions…"
+          />
+        </div>
+      ) : (
+        footerNote && (
+          <div className="mt-8 pt-6 border-t border-zinc-100">
+            <p className="text-xs text-zinc-500 leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
+              {footerNote}
+            </p>
+          </div>
+        )
+      )}
+
+      {/* Company info — client view only */}
+      {view === 'client' && (
+        <div className="mt-6 pt-5 border-t border-zinc-100 flex items-center justify-between flex-wrap gap-2">
+          <p className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
+            1616 N La Brea Ave Unit 302, Los Angeles, CA
+          </p>
+          <p className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
+            hello@littlehouse.studio
+          </p>
+        </div>
+      )}
     </>
   )
 
@@ -354,6 +395,24 @@ export default function App() {
     <div className="min-h-screen bg-white">
       <EstimatorHeader {...headerProps} />
       <ViewToggleBar view={view} setView={setView} />
+
+      {/* ── Print-only footer note + company info ── */}
+      {footerNote && (
+        <div className="hidden print-show px-16 pt-6 pb-2">
+          <p className="text-xs text-zinc-500 leading-relaxed border-t border-zinc-100 pt-5"
+            style={{ fontFamily: 'var(--font-body)' }}>
+            {footerNote}
+          </p>
+        </div>
+      )}
+      <div className="hidden print-show px-16 pb-8 flex items-center justify-between border-t border-zinc-100 pt-4">
+        <p className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
+          1616 N La Brea Ave Unit 302, Los Angeles, CA
+        </p>
+        <p className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
+          hello@littlehouse.studio
+        </p>
+      </div>
 
       {/* ── Print-only header ── */}
       <div className="hidden print-show px-16 pt-10 pb-8 border-b-2 border-zinc-200">

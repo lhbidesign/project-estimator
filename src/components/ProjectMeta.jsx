@@ -33,6 +33,7 @@ export default function ProjectMeta({
   clients, setClients,
   clientId, setClientId,
   contact, setContact,
+  clientAddress, setClientAddress,
   projectDesigner, setProjectDesigner,
   hideHours, setHideHours,
   estimateDate, setEstimateDate,
@@ -182,10 +183,10 @@ export default function ProjectMeta({
 
         <span className="text-zinc-200 text-sm hidden sm:block">|</span>
 
-        {/* Designer */}
+        {/* Main Designer */}
         <div className="flex items-center gap-2">
           <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
-            style={{ fontFamily: 'var(--font-body)' }}>Designer</span>
+            style={{ fontFamily: 'var(--font-body)' }}>Main Designer</span>
           <select
             value={projectDesigner}
             onChange={e => setProjectDesigner(e.target.value)}
@@ -218,6 +219,24 @@ export default function ProjectMeta({
             style={{ fontFamily: 'var(--font-body)' }}
           />
         </div>
+
+        <span className="text-zinc-200 text-sm hidden lg:block">|</span>
+
+        {/* Client address */}
+        {clientId && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
+              style={{ fontFamily: 'var(--font-body)' }}>Address</span>
+            <input
+              value={clientAddress}
+              onChange={e => setClientAddress(e.target.value)}
+              placeholder="Client address (optional)"
+              className="focus-light bg-transparent text-sm font-medium text-zinc-600 placeholder-zinc-300 border-none outline-none w-64 hover:text-zinc-800 transition-colors"
+              style={{ fontFamily: 'var(--font-body)' }}
+              aria-label="Client address"
+            />
+          </div>
+        )}
 
         {/* Hide hours toggle */}
         <label className="flex items-center gap-2 ml-auto cursor-pointer">

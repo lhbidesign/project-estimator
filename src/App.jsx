@@ -46,6 +46,7 @@ export default function App() {
   const [hideHours,       setHideHours]       = useState(false)
   const [estimateDate,    setEstimateDate]    = useState(() => new Date().toISOString().slice(0, 10))
   const [estimateNumber,  setEstimateNumber]  = useState(null)
+  const [clientAddress,   setClientAddress]   = useState('')
 
   // Undo/redo for sections
   const { sections, push, undo, redo, canUndo, canRedo, reset: resetHistory } = useHistory([blankSection()])
@@ -112,7 +113,7 @@ export default function App() {
       savedAt: new Date().toISOString(),
       estimateNumber: num,
       estimateDate,
-      projectName, clientId, clientName, contact, projectDesigner, pmPercent, sections,
+      projectName, clientId, clientName, contact, clientAddress, projectDesigner, pmPercent, sections,
       totalBilled: p.totalBilled,
     }
     let updated
@@ -138,6 +139,7 @@ export default function App() {
     setPmPercent(est.pmPercent ?? 15)
     setEstimateDate(est.estimateDate ?? new Date().toISOString().slice(0, 10))
     setEstimateNumber(est.estimateNumber ?? null)
+    setClientAddress(est.clientAddress ?? '')
     if (est.clientId && clients.find(c => c.id === est.clientId)) {
       setClientId(est.clientId)
     } else if (est.clientName) {
@@ -172,6 +174,7 @@ export default function App() {
     setProjectDesigner('stef')
     setPmPercent(15)
     setHideHours(false)
+    setClientAddress('')
     setEstimateDate(new Date().toISOString().slice(0, 10))
     setEstimateNumber(null)
     resetHistory([blankSection()])
@@ -263,6 +266,7 @@ export default function App() {
     contact, setContact,
     projectDesigner, setProjectDesigner,
     hideHours, setHideHours,
+    clientAddress, setClientAddress,
     estimateDate, setEstimateDate,
     estimateNumber,
     onSave: saveEstimate, justSaved, saveError,
@@ -343,42 +347,82 @@ export default function App() {
   }
 
   // ── CLIENT VIEW ──
+  const formattedDate = estimateDate
+    ? new Date(estimateDate + 'T12:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+
   return (
     <div className="min-h-screen bg-white">
       <EstimatorHeader {...headerProps} />
       <ViewToggleBar view={view} setView={setView} />
 
-      <div className="hidden print-show pt-8 pb-6 border-b border-zinc-200 px-16">
-        <p className="text-xs font-black uppercase tracking-widest mb-1" style={{ color: '#4e6300', fontFamily: 'var(--font-body)' }}>
-          Little House Studio
-        </p>
-        <h1 className="text-2xl font-black text-zinc-900" style={{ fontFamily: 'var(--font-display)' }}>
-          {projectName || 'Project Estimate'}
-        </h1>
-        {(clientName || contact) && (
-          <p className="text-zinc-500 text-sm mt-0.5">{[clientName, contact].filter(Boolean).join(' · ')}</p>
-        )}
+      {/* ── Print-only header ── */}
+      <div className="hidden print-show px-16 pt-10 pb-8 border-b-2 border-zinc-200">
+        <div className="flex items-start justify-between gap-8">
+          {/* Left: project + client info */}
+          <div className="flex-1">
+            <h1 className="text-3xl font-black text-zinc-900 leading-tight mb-2"
+              style={{ fontFamily: 'var(--font-display)' }}>
+              {projectName || 'Project Estimate'}
+            </h1>
+            {(clientName || contact) && (
+              <p className="text-zinc-600 text-sm font-semibold" style={{ fontFamily: 'var(--font-body)' }}>
+                {[clientName, contact].filter(Boolean).join(' · ')}
+              </p>
+            )}
+            {clientAddress && (
+              <p className="text-zinc-500 text-sm mt-0.5 whitespace-pre-line" style={{ fontFamily: 'var(--font-body)' }}>
+                {clientAddress}
+              </p>
+            )}
+            <p className="text-zinc-400 text-xs mt-3 font-mono">
+              {[estimateNumber, formattedDate].filter(Boolean).join(' · ')}
+            </p>
+          </div>
+          {/* Right: studio logo */}
+          <img
+            src={`${import.meta.env.BASE_URL}lhbi-logo.png`}
+            alt="Little House Studio"
+            className="h-20 w-auto object-contain flex-shrink-0"
+          />
+        </div>
       </div>
 
-      <main className="pt-[120px]">
+      <main className="pt-[140px]">
         <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
+
+          {/* ── Screen-only header ── */}
           <div className="no-print mb-10 pb-8 border-b border-zinc-100">
-            {/* Logo + Print row */}
-            <div className="flex items-start justify-between gap-6 mb-6">
-              {/* Studio logo */}
-              <img
-                src={`${import.meta.env.BASE_URL}lhbi-logo.png`}
-                alt="Little House Studio"
-                className="h-10 w-auto object-contain"
-              />
-              {/* Date + Print */}
-              <div className="flex flex-col items-end gap-3">
-                <p className="text-zinc-400 text-sm" style={{ fontFamily: 'var(--font-body)' }}>
-                  {estimateDate
-                    ? new Date(estimateDate + 'T12:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-                    : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-                  }
+            <div className="flex items-start justify-between gap-8">
+
+              {/* Left: project + client info */}
+              <div className="flex-1">
+                <h1 className="text-4xl font-black text-zinc-900 leading-tight mb-2"
+                  style={{ fontFamily: 'var(--font-display)' }}>
+                  {projectName || 'Project Estimate'}
+                </h1>
+                {(clientName || contact) && (
+                  <p className="text-zinc-600 text-sm font-semibold" style={{ fontFamily: 'var(--font-body)' }}>
+                    {[clientName, contact].filter(Boolean).join(' · ')}
+                  </p>
+                )}
+                {clientAddress && (
+                  <p className="text-zinc-500 text-sm mt-0.5 whitespace-pre-line" style={{ fontFamily: 'var(--font-body)' }}>
+                    {clientAddress}
+                  </p>
+                )}
+                <p className="text-zinc-400 text-xs mt-3 font-mono">
+                  {[estimateNumber, formattedDate].filter(Boolean).join(' · ')}
                 </p>
+              </div>
+
+              {/* Right: large studio logo + print button */}
+              <div className="flex flex-col items-end gap-4 flex-shrink-0">
+                <img
+                  src={`${import.meta.env.BASE_URL}lhbi-logo.png`}
+                  alt="Little House Studio"
+                  className="h-20 w-auto object-contain"
+                />
                 <button
                   onClick={() => window.print()}
                   className="focus-light px-4 py-2 border border-zinc-300 text-zinc-500 text-xs font-bold uppercase tracking-widest hover:border-zinc-900 hover:text-zinc-900 transition-all rounded-lg"
@@ -388,20 +432,6 @@ export default function App() {
                 </button>
               </div>
             </div>
-
-            {/* Project info */}
-            <h1 className="text-4xl font-black text-zinc-900 leading-tight mb-1.5"
-              style={{ fontFamily: 'var(--font-display)' }}>
-              {projectName || 'Project Estimate'}
-            </h1>
-            {(clientName || contact) && (
-              <p className="text-zinc-500 text-sm font-medium" style={{ fontFamily: 'var(--font-body)' }}>
-                {[clientName, contact].filter(Boolean).join(' · ')}
-              </p>
-            )}
-            {estimateNumber && (
-              <p className="text-xs text-zinc-400 font-mono mt-1">{estimateNumber}</p>
-            )}
           </div>
           {estimatorContent}
         </div>

@@ -147,8 +147,8 @@ export default function ProjectMeta({
         />
       </div>
 
-      {/* Row 2: metadata */}
-      <div className="flex items-center gap-4 flex-wrap">
+      {/* Row 2: Client · Contact · Address  [Valid — right-aligned under Estimate Date] */}
+      <div className="flex items-center gap-4 mb-3">
 
         {/* Client */}
         <div className="flex items-center gap-2">
@@ -215,36 +215,10 @@ export default function ProjectMeta({
           </div>
         )}
 
-        <span className="text-zinc-200 text-sm hidden sm:block">|</span>
-
-        {/* Main Designer */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
-            style={{ fontFamily: 'var(--font-body)' }}>Main Designer</span>
-          <select
-            value={projectDesigner}
-            onChange={e => setProjectDesigner(e.target.value)}
-            className="focus-light border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-800 bg-white outline-none focus:border-zinc-900 cursor-pointer appearance-none pr-7"
-            style={selectStyle}
-          >
-            {DESIGN_RESOURCES.map(key => resources[key] && (
-              <option key={key} value={key}>{resources[key].label}</option>
-            ))}
-          </select>
-        </div>
-
-        <span className="text-zinc-200 text-sm hidden lg:block">|</span>
-
-        {/* Estimate number */}
-        {estimateNumber && (
-          <span className="text-xs font-black text-zinc-400 tabular" style={{ fontFamily: 'var(--font-body)' }}>
-            {estimateNumber}
-          </span>
-        )}
-
-        {/* Client address */}
+        {/* Address */}
         {clientId && (
           <div className="flex items-center gap-2">
+            <span className="text-zinc-200 text-sm">·</span>
             <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
               style={{ fontFamily: 'var(--font-body)' }}>Address</span>
             <input
@@ -258,10 +232,8 @@ export default function ProjectMeta({
           </div>
         )}
 
-        <span className="text-zinc-200 text-sm">|</span>
-
-        {/* Validity period — quick buttons + expiry date picker */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Valid — right-aligned, sits below Estimate Date */}
+        <div className="flex items-center gap-2 ml-auto pl-4 border-l border-zinc-200">
           <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
             style={{ fontFamily: 'var(--font-body)' }}>Valid</span>
           <div className="flex gap-1">
@@ -281,7 +253,6 @@ export default function ProjectMeta({
             ))}
           </div>
           <span className="text-zinc-300 text-xs">or</span>
-          {/* Expiry date picker — synced with validDays */}
           <input
             type="date"
             value={
@@ -302,6 +273,36 @@ export default function ProjectMeta({
             style={{ fontFamily: 'var(--font-body)' }}
           />
         </div>
+      </div>
+
+      {/* Row 3: Main Designer | EST# | Hide hours */}
+      <div className="flex items-center gap-4">
+
+        {/* Main Designer */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
+            style={{ fontFamily: 'var(--font-body)' }}>Main Designer</span>
+          <select
+            value={projectDesigner}
+            onChange={e => setProjectDesigner(e.target.value)}
+            className="focus-light border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-800 bg-white outline-none focus:border-zinc-900 cursor-pointer appearance-none pr-7"
+            style={selectStyle}
+          >
+            {DESIGN_RESOURCES.map(key => resources[key] && (
+              <option key={key} value={key}>{resources[key].label}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Estimate number */}
+        {estimateNumber && (
+          <>
+            <span className="text-zinc-200 text-sm">|</span>
+            <span className="text-xs font-black text-zinc-400 tabular" style={{ fontFamily: 'var(--font-body)' }}>
+              {estimateNumber}
+            </span>
+          </>
+        )}
 
         {/* Hide hours toggle */}
         <label className="flex items-center gap-2 ml-auto cursor-pointer">

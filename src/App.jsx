@@ -351,7 +351,7 @@ export default function App() {
         <EstimatorHeader {...headerProps} />
         <ViewToggleBar {...toggleBarProps} />
 
-        <main className="pt-[140px]">
+        <main className="pt-[152px]">
           <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
             <ProjectMeta {...metaProps} />
             <BudgetCalculator pmPercent={pmPercent} projectDesigner={projectDesigner} onAddItems={addItemsToFirst} />
@@ -452,7 +452,7 @@ export default function App() {
         </div>
       </div>
 
-      <main className="pt-[140px]">
+      <main className="pt-[152px]">
         <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
 
           {/* ── Screen-only header ── */}

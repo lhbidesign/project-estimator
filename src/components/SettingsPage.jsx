@@ -88,7 +88,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="pt-[68px] min-h-screen" style={{ background: 'var(--page-bg)' }}>
+    <div className="pt-[80px] min-h-screen" style={{ background: 'var(--page-bg)' }}>
       <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
 
         <div className="mb-8">

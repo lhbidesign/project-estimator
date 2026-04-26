@@ -16,7 +16,7 @@ function GearIcon() {
 export default function EstimatorHeader({ page, setPage, onOpenSettings }) {
   return (
     <nav
-      className="no-print fixed top-0 w-full z-50 flex items-center justify-between px-8 h-[68px]"
+      className="no-print fixed top-0 w-full z-50 flex items-center justify-between px-8 h-[80px]"
       style={{
         background: 'rgba(12,12,12,0.94)',
         backdropFilter: 'blur(40px)',
@@ -33,14 +33,14 @@ export default function EstimatorHeader({ page, setPage, onOpenSettings }) {
         <img
           src={`${import.meta.env.BASE_URL}lh-logo.png`}
           alt="Little House"
-          className="h-6 w-auto"
+          className="h-11 w-auto"
           style={{ filter: 'brightness(0) invert(1)' }}
         />
-        <span className="text-white font-bold text-sm tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
+        <span className="text-white font-extrabold text-xl tracking-wide" style={{ fontFamily: 'var(--font-display)' }}>
           Studio
         </span>
-        <span className="text-white/25 text-base font-thin select-none">|</span>
-        <span className="text-white/50 text-xs font-semibold tracking-widest uppercase" style={{ fontFamily: 'var(--font-body)' }}>
+        <span className="text-white/20 text-lg font-thin select-none">|</span>
+        <span className="text-white/45 text-xs font-semibold tracking-widest uppercase" style={{ fontFamily: 'var(--font-body)' }}>
           Estimator
         </span>
       </button>

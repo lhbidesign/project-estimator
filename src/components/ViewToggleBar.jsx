@@ -4,7 +4,7 @@ export default function ViewToggleBar({ view, setView, onOpenEstimates, savedCou
   return (
     <div
       className="fixed left-0 right-0 z-40 no-print flex items-center px-8"
-      style={{ top: '68px', height: '72px', background: 'var(--page-bg)', borderBottom: '1px solid #e4e4e7' }}
+      style={{ top: '80px', height: '72px', background: 'var(--page-bg)', borderBottom: '1px solid #e4e4e7' }}
     >
       {/* Perfectly centered toggle */}
       <div className="absolute left-0 right-0 flex justify-center pointer-events-none">

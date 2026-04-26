@@ -64,7 +64,7 @@ export default function ProjectMeta({
 
   return (
     <div className="mb-6">
-      {/* Row 1: project name + undo/redo/reset/save */}
+      {/* Row 1: project name + undo/redo/reset/save + estimate date (right) */}
       <div className="flex items-center gap-2 mb-4">
         <input
           value={projectName}
@@ -119,6 +119,19 @@ export default function ProjectMeta({
               {saveError === 'name' ? 'Add a project name' : 'Select a client'}
             </p>
           )}
+        </div>
+
+        {/* Estimate Date — right-aligned */}
+        <div className="flex items-center gap-2 ml-4 pl-4 border-l border-zinc-200">
+          <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
+            style={{ fontFamily: 'var(--font-body)' }}>Estimate Date</span>
+          <input
+            type="date"
+            value={estimateDate}
+            onChange={e => setEstimateDate(e.target.value)}
+            className="focus-light border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-700 bg-white outline-none focus:border-zinc-900 cursor-pointer"
+            style={{ fontFamily: 'var(--font-body)' }}
+          />
         </div>
       </div>
 
@@ -222,24 +235,30 @@ export default function ProjectMeta({
 
         <span className="text-zinc-200 text-sm hidden lg:block">|</span>
 
-        {/* Estimate number + Date */}
+        {/* Estimate number */}
         {estimateNumber && (
           <span className="text-xs font-black text-zinc-400 tabular" style={{ fontFamily: 'var(--font-body)' }}>
             {estimateNumber}
           </span>
         )}
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
-            style={{ fontFamily: 'var(--font-body)' }}>Date</span>
-          <input
-            type="date"
-            value={estimateDate}
-            onChange={e => setEstimateDate(e.target.value)}
-            className="focus-light border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-700 bg-white outline-none focus:border-zinc-900 cursor-pointer"
-            style={{ fontFamily: 'var(--font-body)' }}
-          />
-        </div>
+        {/* Client address */}
+        {clientId && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
+              style={{ fontFamily: 'var(--font-body)' }}>Address</span>
+            <input
+              value={clientAddress}
+              onChange={e => setClientAddress(e.target.value)}
+              placeholder="Client address (optional)"
+              className="focus-light bg-transparent text-sm font-medium text-zinc-600 placeholder-zinc-300 border-none outline-none w-56 hover:text-zinc-800 transition-colors"
+              style={{ fontFamily: 'var(--font-body)' }}
+              aria-label="Client address"
+            />
+          </div>
+        )}
+
+        <span className="text-zinc-200 text-sm">|</span>
 
         {/* Validity period — quick buttons + expiry date picker */}
         <div className="flex items-center gap-2 flex-wrap">
@@ -283,24 +302,6 @@ export default function ProjectMeta({
             style={{ fontFamily: 'var(--font-body)' }}
           />
         </div>
-
-        <span className="text-zinc-200 text-sm hidden lg:block">|</span>
-
-        {/* Client address */}
-        {clientId && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
-              style={{ fontFamily: 'var(--font-body)' }}>Address</span>
-            <input
-              value={clientAddress}
-              onChange={e => setClientAddress(e.target.value)}
-              placeholder="Client address (optional)"
-              className="focus-light bg-transparent text-sm font-medium text-zinc-600 placeholder-zinc-300 border-none outline-none w-64 hover:text-zinc-800 transition-colors"
-              style={{ fontFamily: 'var(--font-body)' }}
-              aria-label="Client address"
-            />
-          </div>
-        )}
 
         {/* Hide hours toggle */}
         <label className="flex items-center gap-2 ml-auto cursor-pointer">

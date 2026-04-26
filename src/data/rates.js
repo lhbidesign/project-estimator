@@ -46,6 +46,15 @@ export const PROJECT_CATEGORIES = [
   { id: 'general_design', label: 'General Design'   },
 ]
 
+// Billing rate used in the Service Hour/Cost Guide (reference guide, not estimator calculations)
+export const CATEGORY_RATES = {
+  experiential:   150,
+  branding:       200,
+  web:            200,
+  presentation:   150,
+  general_design: 150,
+}
+
 // hours = avg estimate
 export const HOUR_GUIDES = [
   // ── Experiential ──

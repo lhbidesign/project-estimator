@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: 'Manrope', system-ui, sans-serif;
+    --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
+    --lime:         #CCFF00;
+    --page-bg:      #f5f7f2;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--page-bg);
+    color: #2c2f2c;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input[type=number] { -moz-appearance: textfield; }
+
+  /* ADA focus visible ring — lime on dark topbar, zinc on light surfaces */
+  :focus-visible {
+    outline: 2px solid #CCFF00;
+    outline-offset: 2px;
+  }
+  .focus-light:focus-visible {
+    outline: 2px solid #18181b;
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .font-display  { font-family: var(--font-display); }
+  .font-body     { font-family: var(--font-body); }
+  .tabular       { font-variant-numeric: tabular-nums; }
+}
+
+@media print {
+  .no-print    { display: none !important; }
+  .print-show  { display: block !important; }
+  body         { background: #fff !important; }
+  nav          { display: none !important; }
+}

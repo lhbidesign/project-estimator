@@ -2,9 +2,10 @@ import { useRates } from '../contexts/RatesContext.jsx'
 import { calcProject, fmt, fmtPct, marginColor } from '../utils/calc.js'
 
 const GM = {
-  green:  { bg: 'bg-green-50',  border: 'border-green-200', num: 'text-green-700',  label: 'Healthy'      },
-  yellow: { bg: 'bg-amber-50',  border: 'border-amber-200', num: 'text-amber-700',  label: 'Fair'         },
-  red:    { bg: 'bg-red-50',    border: 'border-red-200',   num: 'text-red-700',    label: 'Below Target' },
+  neutral: { bg: 'bg-zinc-50',   border: 'border-zinc-200',  num: 'text-zinc-400',   label: '—'            },
+  green:   { bg: 'bg-green-50',  border: 'border-green-200', num: 'text-green-700',  label: 'Healthy'      },
+  yellow:  { bg: 'bg-amber-50',  border: 'border-amber-200', num: 'text-amber-700',  label: 'Fair'         },
+  red:     { bg: 'bg-red-50',    border: 'border-red-200',   num: 'text-red-700',    label: 'Below Target' },
 }
 
 const PM_OPTIONS = [0, 10, 15, 20]
@@ -12,7 +13,7 @@ const PM_OPTIONS = [0, 10, 15, 20]
 export default function SummaryPanel({ sections, pmPercent, setPmPercent, view }) {
   const { resources, pmRate } = useRates()
   const p  = calcProject(sections, pmPercent, resources, pmRate)
-  const mc = marginColor(p.gm)
+  const mc = p.totalBilled === 0 ? 'neutral' : marginColor(p.gm)
   const g  = GM[mc]
 
   if (view === 'client') {

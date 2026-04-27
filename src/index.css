@@ -41,9 +41,17 @@
 @media print {
   .no-print    { display: none !important; }
   .print-show  { display: block !important; }
-  body         { background: #fff !important; }
+  body         { background: #fff !important; color: #111 !important; }
   nav          { display: none !important; }
   main         { padding-top: 0 !important; }
+
+  /* Force near-black text on all print content */
+  main *, .print-show * { color: #111 !important; }
+
+  /* Darker, more pronounced borders */
+  main [class*="border"],
+  .print-show [class*="border"] { border-color: #ccc !important; }
+  .print-border-heavy           { border-color: #111 !important; }
 
   .print-footer {
     display: flex !important;
@@ -51,8 +59,8 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 10px 64px;
-    border-top: 1px solid #e4e4e7;
+    padding: 10px 32px;
+    border-top: 1px solid #bbb;
     background: #fff;
     justify-content: space-between;
     align-items: center;

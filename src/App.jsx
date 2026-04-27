@@ -338,9 +338,9 @@ export default function App() {
         )
       )}
 
-      {/* Company info — client view only */}
+      {/* Company info — screen only; print footer handles this */}
       {view === 'client' && (
-        <div className="mt-6 pt-5 border-t border-zinc-100 flex items-center justify-between flex-wrap gap-2">
+        <div className="no-print mt-6 pt-5 border-t border-zinc-100 flex items-center justify-between flex-wrap gap-2">
           <p className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
             1616 N La Brea Ave Unit 302, Los Angeles, CA
           </p>
@@ -405,42 +405,42 @@ export default function App() {
       <ViewToggleBar view={view} setView={setView} />
 
       {/* ── Print-only header ── */}
-      <div className="hidden print-show px-16 pt-10 pb-8 border-b-2 border-zinc-200">
+      <div className="hidden print-show px-8 pt-8 pb-6 print-border-heavy" style={{ borderBottom: '2px solid #111' }}>
         <div className="flex items-start justify-between gap-8">
           <div className="flex-1">
-            <h1 className="text-3xl font-black text-zinc-900 leading-tight mb-0.5"
-              style={{ fontFamily: 'var(--font-display)' }}>
+            <h1 className="text-4xl font-black leading-tight mb-1"
+              style={{ fontFamily: 'var(--font-display)', color: '#111' }}>
               {projectName || 'Project Estimate'}
             </h1>
             {projectDescription && (
-              <p className="text-zinc-500 text-sm font-medium mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-sm font-medium mb-3" style={{ fontFamily: 'var(--font-body)', color: '#444' }}>
                 {projectDescription}
               </p>
             )}
             {(clientName || contact) && (
-              <p className="text-zinc-600 text-sm font-semibold" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-sm font-semibold" style={{ fontFamily: 'var(--font-body)', color: '#222' }}>
                 {[clientName, contact].filter(Boolean).join(' · ')}
               </p>
             )}
             {clientAddress && (
-              <p className="text-zinc-500 text-sm mt-0.5 whitespace-pre-line" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-sm mt-0.5 whitespace-pre-line" style={{ fontFamily: 'var(--font-body)', color: '#444' }}>
                 {clientAddress}
               </p>
             )}
-            <p className="text-zinc-400 text-xs mt-3 font-mono">
+            <p className="text-xs mt-3 font-mono" style={{ color: '#555' }}>
               {[estimateNumber, formattedDate].filter(Boolean).join(' · ')}
             </p>
             {expiryDate && (
-              <p className="text-zinc-400 text-xs mt-0.5" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-xs mt-0.5" style={{ fontFamily: 'var(--font-body)', color: '#555' }}>
                 Valid through {expiryDate}
               </p>
             )}
           </div>
           <div className="flex flex-col items-end gap-1 flex-shrink-0">
             <img src={`${import.meta.env.BASE_URL}lhbi-logo.png`} alt="Little House Studio"
-              className="h-24 w-auto object-contain" />
-            <p className="text-zinc-500 text-sm font-bold tracking-[0.25em] uppercase"
-              style={{ fontFamily: 'var(--font-display)' }}>
+              className="h-32 w-auto object-contain" />
+            <p className="text-sm font-bold tracking-[0.25em] uppercase mt-1"
+              style={{ fontFamily: 'var(--font-display)', color: '#555' }}>
               Estimate
             </p>
           </div>
@@ -514,8 +514,8 @@ export default function App() {
 
       {/* Pinned footer — print only, appears on every page */}
       <div className="print-footer hidden" style={{ fontFamily: 'var(--font-body)' }}>
-        <span className="text-xs text-zinc-400">1616 N La Brea Ave Unit 302, Los Angeles, CA</span>
-        <span className="text-xs text-zinc-400">hello@littlehouse.studio</span>
+        <span className="text-xs" style={{ color: '#555' }}>1616 N La Brea Ave Unit 302, Los Angeles, CA</span>
+        <span className="text-xs" style={{ color: '#555' }}>hello@littlehouse.studio</span>
       </div>
     </div>
   )

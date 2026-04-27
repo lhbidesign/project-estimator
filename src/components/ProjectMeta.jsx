@@ -299,7 +299,7 @@ export default function ProjectMeta({
         {/* Project Rate */}
         <div className="flex items-center gap-2">
           <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
-            style={{ fontFamily: 'var(--font-body)' }}>Rate</span>
+            style={{ fontFamily: 'var(--font-body)' }}>Project Rate</span>
           <div className="relative">
             <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none">$</span>
             <input

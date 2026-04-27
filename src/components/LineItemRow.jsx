@@ -25,7 +25,7 @@ export default function LineItemRow({ item, view, onChange, onDelete, hideHours,
           {item.name || <span className="text-zinc-400 italic">Untitled</span>}
         </td>
         {!hideRate && (
-          <td className="py-3 pr-4 text-zinc-500 text-sm text-right tabular" style={{ fontFamily: 'var(--font-body)' }}>
+          <td className="hidden sm:table-cell py-3 pr-4 text-zinc-500 text-sm text-right tabular" style={{ fontFamily: 'var(--font-body)' }}>
             {isFlat ? 'Flat' : rate ? `$${rate}/hr` : '—'}
           </td>
         )}

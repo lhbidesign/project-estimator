@@ -52,7 +52,7 @@ export default function SummaryPanel({ sections, pmPercent, setPmPercent, view }
               <button
                 key={pct}
                 onClick={() => setPmPercent(pct)}
-                className={`flex-1 py-2 rounded-md text-xs font-bold transition-all focus-light ${
+                className={`flex-1 py-3 sm:py-2 rounded-md text-xs font-bold transition-all focus-light ${
                   pmPercent === pct ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'
                 }`}
                 style={{ fontFamily: 'var(--font-body)' }}

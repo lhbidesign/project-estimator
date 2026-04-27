@@ -72,7 +72,7 @@ export default function ProjectMeta({
           value={projectName}
           onChange={e => setProjectName(e.target.value)}
           placeholder="Project name"
-          className={`focus-light flex-1 bg-transparent text-3xl font-black text-zinc-900 placeholder-zinc-400 border-none outline-none min-w-0 ${saveError === 'name' ? 'placeholder-red-400' : ''}`}
+          className={`focus-light flex-1 bg-transparent text-2xl sm:text-3xl font-black text-zinc-900 placeholder-zinc-400 border-none outline-none min-w-0 ${saveError === 'name' ? 'placeholder-red-400' : ''}`}
           style={{ fontFamily: 'var(--font-display)' }}
           aria-label="Project name"
         />
@@ -123,8 +123,8 @@ export default function ProjectMeta({
           )}
         </div>
 
-        {/* Estimate Date — right-aligned */}
-        <div className="flex items-center gap-2 ml-4 pl-4 border-l border-zinc-200">
+        {/* Estimate Date — right-aligned on desktop */}
+        <div className="flex items-center gap-2 sm:ml-4 sm:pl-4 sm:border-l sm:border-zinc-200">
           <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
             style={{ fontFamily: 'var(--font-body)' }}>Estimate Date</span>
           <input
@@ -150,7 +150,7 @@ export default function ProjectMeta({
       </div>
 
       {/* Row 2: Client · Contact · Address  [Valid — right-aligned under Estimate Date] */}
-      <div className="flex items-center gap-4 mb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-3">
 
         {/* Client */}
         <div className="flex items-center gap-2">
@@ -190,7 +190,7 @@ export default function ProjectMeta({
         {/* Contact */}
         {clientId && (
           <div className="flex items-center gap-2">
-            <span className="text-zinc-200 text-sm">·</span>
+            <span className="hidden sm:inline text-zinc-200 text-sm">·</span>
             <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
               style={{ fontFamily: 'var(--font-body)' }}>Contact</span>
             {otherContact ? (
@@ -220,7 +220,7 @@ export default function ProjectMeta({
         {/* Address */}
         {clientId && (
           <div className="flex items-center gap-2">
-            <span className="text-zinc-200 text-sm">·</span>
+            <span className="hidden sm:inline text-zinc-200 text-sm">·</span>
             <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
               style={{ fontFamily: 'var(--font-body)' }}>Address</span>
             <input
@@ -234,8 +234,8 @@ export default function ProjectMeta({
           </div>
         )}
 
-        {/* Valid — right-aligned, sits below Estimate Date */}
-        <div className="flex items-center gap-2 ml-auto pl-4 border-l border-zinc-200">
+        {/* Valid */}
+        <div className="flex items-center gap-2 sm:ml-auto sm:pl-4 sm:border-l sm:border-zinc-200">
           <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
             style={{ fontFamily: 'var(--font-body)' }}>Valid</span>
           <div className="flex gap-1">
@@ -278,7 +278,7 @@ export default function ProjectMeta({
       </div>
 
       {/* Row 3: Main Designer | EST# | Hide hours */}
-      <div className="flex items-center gap-4 pt-3 mt-1 border-t border-zinc-200">
+      <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-3 mt-1 border-t border-zinc-200">
 
         {/* Main Designer */}
         <div className="flex items-center gap-2">
@@ -323,8 +323,8 @@ export default function ProjectMeta({
           </>
         )}
 
-        {/* Toggles — right-aligned */}
-        <div className="flex items-center gap-4 ml-auto">
+        {/* Toggles */}
+        <div className="flex items-center gap-4 sm:ml-auto">
           <label className="flex items-center gap-2 cursor-pointer">
             <div
               onClick={() => setHideRate(v => !v)}

@@ -9,6 +9,7 @@ import RateCardPage     from './components/RateCardPage.jsx'
 import AIGeneratePage   from './components/AIGeneratePage.jsx'
 import SettingsPage     from './components/SettingsPage.jsx'
 import EstimatesDrawer  from './components/EstimatesDrawer.jsx'
+import BottomNav       from './components/BottomNav.jsx'
 import { useHistory }   from './hooks/useHistory.js'
 import { nanoid }       from './utils/nanoid.js'
 import { calcProject }  from './utils/calc.js'
@@ -243,23 +244,28 @@ export default function App() {
     onLoadPreset: loadPreset,
   }
 
+  const bottomNav = <BottomNav page={page} setPage={setPage} />
+
   // ── Non-estimator pages ──
   if (page === 'rate-card') return (
     <>
       <EstimatorHeader {...headerProps} />
-      <RateCardPage />
+      <div className="pb-20 sm:pb-0"><RateCardPage /></div>
+      {bottomNav}
     </>
   )
   if (page === 'generate') return (
     <>
       <EstimatorHeader {...headerProps} />
-      <AIGeneratePage onApply={applyGenerated} onGoToSettings={() => setPage('settings')} />
+      <div className="pb-20 sm:pb-0"><AIGeneratePage onApply={applyGenerated} onGoToSettings={() => setPage('settings')} /></div>
+      {bottomNav}
     </>
   )
   if (page === 'settings') return (
     <>
       <EstimatorHeader {...headerProps} />
-      <SettingsPage />
+      <div className="pb-20 sm:pb-0"><SettingsPage /></div>
+      {bottomNav}
     </>
   )
 
@@ -367,15 +373,15 @@ export default function App() {
         <EstimatorHeader {...headerProps} />
         <ViewToggleBar {...toggleBarProps} />
 
-        <main className="pt-[152px]">
-          <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
+        <main className="pt-[144px] pb-20 sm:pb-0">
+          <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-16 py-6 sm:py-10">
             <ProjectMeta {...metaProps} />
             <BudgetCalculator pmPercent={pmPercent} projectDesigner={projectDesigner} onAddItems={addItemsToFirst} />
             {estimatorContent}
           </div>
         </main>
 
-        <footer className="border-t border-zinc-200 py-4 mt-8">
+        <footer className="hidden sm:block border-t border-zinc-200 py-4 mt-8">
           <div className="max-w-[1400px] mx-auto px-8 lg:px-16 flex justify-between items-center">
             <span className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
               Little House Studio — Internal use only
@@ -386,6 +392,7 @@ export default function App() {
           </div>
         </footer>
 
+        {bottomNav}
         <EstimatesDrawer
           open={historyOpen}
           onClose={() => setHistoryOpen(false)}
@@ -460,8 +467,8 @@ export default function App() {
         </div>
       </div>
 
-      <main className="pt-[152px]">
-        <div className="max-w-[1400px] mx-auto px-8 lg:px-16 py-10">
+      <main className="pt-[144px] pb-20 sm:pb-0">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-16 py-6 sm:py-10">
 
           {/* ── Screen-only header ── */}
           <div className="no-print mb-10 pb-8 border-b border-zinc-100">
@@ -469,7 +476,7 @@ export default function App() {
 
               {/* Left: project + client info */}
               <div className="flex-1">
-                <h1 className="text-4xl font-black text-zinc-900 leading-tight mb-0.5"
+                <h1 className="text-2xl sm:text-4xl font-black text-zinc-900 leading-tight mb-0.5"
                   style={{ fontFamily: 'var(--font-display)' }}>
                   {projectName || 'Project Estimate'}
                 </h1>
@@ -534,6 +541,8 @@ export default function App() {
         <span className="text-xs" style={{ color: '#555' }}>1616 N La Brea Ave Unit 302, Los Angeles, CA 90028</span>
         <span className="text-xs" style={{ color: '#555' }}>hello@littlehouse.studio</span>
       </div>
+
+      {bottomNav}
     </div>
   )
 }

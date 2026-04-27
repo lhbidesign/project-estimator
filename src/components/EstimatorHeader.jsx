@@ -51,8 +51,8 @@ export default function EstimatorHeader({ page, setPage, onOpenSettings }) {
         </span>
       </button>
 
-      {/* Center tabs */}
-      <div className="flex items-end gap-0 h-full absolute left-1/2 -translate-x-1/2" role="tablist">
+      {/* Center tabs — desktop only */}
+      <div className="hidden sm:flex items-end gap-0 h-full absolute left-1/2 -translate-x-1/2" role="tablist">
         {PAGES.map(p => (
           <button
             key={p.id}

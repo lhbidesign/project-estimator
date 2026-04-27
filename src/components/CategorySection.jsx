@@ -8,21 +8,21 @@ function defaultResource(categoryId, projectDesigner) {
   return categoryId === 'renderings' ? 'mostafa_general' : (projectDesigner || 'brandon')
 }
 
-function newItem(categoryId, name, projectDesigner) {
-  return { id: nanoid(), name, resource: defaultResource(categoryId, projectDesigner), hours: 8, category: categoryId }
+function newItem(categoryId, name, projectDesigner, projectRate) {
+  return { id: nanoid(), name, resource: defaultResource(categoryId, projectDesigner), hours: 8, category: categoryId, rate: projectRate, isFlat: false, flatAmount: 0 }
 }
 
-export default function CategorySection({ section, view, onChange, onDeleteSection, isOnlySection, projectDesigner, hideHours, hideRate }) {
+export default function CategorySection({ section, view, onChange, onDeleteSection, isOnlySection, projectDesigner, projectRate, hideHours, hideRate }) {
   const { resources } = useRates()
   const totals = calcSection(section.items, resources)
 
   function updateItem(id, u)  { onChange({ ...section, items: section.items.map(i => i.id === id ? u : i) }) }
   function deleteItem(id)     { onChange({ ...section, items: section.items.filter(i => i.id !== id) }) }
   function addItem(catId, name = '') {
-    onChange({ ...section, items: [...section.items, newItem(catId, name === 'Custom line item' ? '' : name, projectDesigner)] })
+    onChange({ ...section, items: [...section.items, newItem(catId, name === 'Custom line item' ? '' : name, projectDesigner, projectRate)] })
   }
   function addBlock(name, resource, category, hours = 8) {
-    onChange({ ...section, items: [...section.items, { id: nanoid(), name, resource, hours, category }] })
+    onChange({ ...section, items: [...section.items, { id: nanoid(), name, resource, hours, category, rate: projectRate, isFlat: false, flatAmount: 0 }] })
   }
 
   /* ── CLIENT VIEW ── */

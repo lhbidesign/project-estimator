@@ -36,6 +36,7 @@ export default function ProjectMeta({
   contact, setContact,
   clientAddress, setClientAddress,
   projectDesigner, setProjectDesigner,
+  projectRate, setProjectRate,
   hideHours, setHideHours,
   hideRate,  setHideRate,
   estimateDate, setEstimateDate,
@@ -293,6 +294,23 @@ export default function ProjectMeta({
               <option key={key} value={key}>{resources[key].label}</option>
             ))}
           </select>
+        </div>
+
+        {/* Project Rate */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
+            style={{ fontFamily: 'var(--font-body)' }}>Rate</span>
+          <div className="relative">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none">$</span>
+            <input
+              type="number" min="0" step="5"
+              value={projectRate}
+              onChange={e => setProjectRate(Number(e.target.value) || 0)}
+              className="focus-light border border-zinc-200 rounded-lg pl-6 pr-2 py-1.5 text-sm font-semibold text-zinc-800 bg-white outline-none focus:border-zinc-900 w-20 tabular"
+              style={{ fontFamily: 'var(--font-body)' }}
+            />
+          </div>
+          <span className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>/hr</span>
         </div>
 
         {/* Estimate number */}

@@ -65,44 +65,64 @@ export default function LineItemRow({ item, view, onChange, onDelete, hideHours,
           ))}
         </select>
       </td>
-      <td className="py-2.5 pr-3 text-right text-zinc-500 text-sm tabular" style={{ fontFamily: 'var(--font-body)' }}>
-        {isFlat ? 'Flat' : rate ? `$${rate}/hr` : '—'}
-      </td>
-      <td className="py-2.5 pr-3 w-32">
-        <div className="flex items-center gap-1.5">
+      {/* Rate — editable, flat toggle lives here */}
+      <td className="py-2.5 pr-3">
+        <div className="flex items-center gap-1 justify-end">
           {isFlat ? (
-            <div className="relative flex-1">
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs">$</span>
-              <input
-                type="number" min="0"
-                value={item.flatAmount ?? 0}
-                onChange={e => set('flatAmount', e.target.value)}
-                className="focus-light border border-zinc-200 text-zinc-800 text-sm font-semibold text-right rounded-lg pl-5 pr-2 py-1.5 w-full outline-none focus:border-zinc-900 tabular bg-white"
-                style={{ fontFamily: 'var(--font-body)' }}
-              />
-            </div>
+            <button
+              onClick={toggleFlat}
+              title="Switch to hourly"
+              className="focus-light px-2 py-1 rounded text-[10px] font-black uppercase tracking-wide bg-zinc-800 text-white border border-zinc-800 transition-all"
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
+              Flat
+            </button>
           ) : (
+            <>
+              <div className="relative">
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 text-[10px] pointer-events-none">$</span>
+                <input
+                  type="number" min="0" step="5"
+                  value={item.rate ?? ''}
+                  onChange={e => set('rate', e.target.value)}
+                  className="focus-light border border-zinc-200 text-zinc-800 text-sm font-semibold text-right rounded-lg pl-4 pr-2 py-1.5 w-20 outline-none focus:border-zinc-900 tabular bg-white"
+                  style={{ fontFamily: 'var(--font-body)' }}
+                />
+              </div>
+              <button
+                onClick={toggleFlat}
+                title="Switch to flat rate"
+                className="focus-light text-zinc-300 hover:text-zinc-600 text-xs px-1 transition-colors"
+                style={{ fontFamily: 'var(--font-body)' }}
+              >
+                F
+              </button>
+            </>
+          )}
+        </div>
+      </td>
+      {/* Hrs — clean input only, flat shows $ amount */}
+      <td className="py-2.5 pr-3 w-24">
+        {isFlat ? (
+          <div className="relative">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none">$</span>
             <input
-              type="number" min="0" step="0.5"
-              value={item.hours}
-              onChange={e => set('hours', e.target.value)}
-              className="focus-light border border-zinc-200 text-zinc-800 text-sm font-semibold text-right rounded-lg px-2.5 py-1.5 w-full outline-none focus:border-zinc-900 tabular bg-white"
+              type="number" min="0"
+              value={item.flatAmount ?? 0}
+              onChange={e => set('flatAmount', e.target.value)}
+              className="focus-light border border-zinc-200 text-zinc-800 text-sm font-semibold text-right rounded-lg pl-5 pr-2 py-1.5 w-full outline-none focus:border-zinc-900 tabular bg-white"
               style={{ fontFamily: 'var(--font-body)' }}
             />
-          )}
-          <button
-            onClick={toggleFlat}
-            title={isFlat ? 'Switch to hourly' : 'Switch to flat rate'}
-            className={`focus-light flex-shrink-0 px-1.5 py-1 rounded text-[10px] font-black uppercase tracking-wide border transition-all ${
-              isFlat
-                ? 'bg-zinc-800 text-white border-zinc-800'
-                : 'text-zinc-400 border-zinc-200 hover:border-zinc-500 hover:text-zinc-600'
-            }`}
+          </div>
+        ) : (
+          <input
+            type="number" min="0" step="0.5"
+            value={item.hours}
+            onChange={e => set('hours', e.target.value)}
+            className="focus-light border border-zinc-200 text-zinc-800 text-sm font-semibold text-right rounded-lg px-2.5 py-1.5 w-full outline-none focus:border-zinc-900 tabular bg-white"
             style={{ fontFamily: 'var(--font-body)' }}
-          >
-            {isFlat ? 'Flat' : '/hr'}
-          </button>
-        </div>
+          />
+        )}
       </td>
       <td className="py-2.5 pr-4 text-right text-zinc-400 text-sm tabular" style={{ fontFamily: 'var(--font-body)' }}>
         {isFlat ? '—' : fmt(internal)}

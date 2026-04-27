@@ -50,6 +50,7 @@ export default function App() {
   const [contact,            setContact]            = useState('')
   const [projectDesigner,    setProjectDesigner]    = useState('stef')
   const [pmPercent,          setPmPercent]          = useState(15)
+  const [projectRate,        setProjectRate]        = useState(150)
   const [hideHours,          setHideHours]          = useState(false)
   const [hideRate,           setHideRate]           = useState(false)
   const [estimateDate,       setEstimateDate]       = useState(() => new Date().toISOString().slice(0, 10))
@@ -114,7 +115,7 @@ export default function App() {
       savedAt: new Date().toISOString(),
       estimateNumber,
       estimateDate, validDays, footerNote,
-      projectName, projectDescription, clientId, clientName, contact, clientAddress, projectDesigner, pmPercent, hideHours, hideRate, sections,
+      projectName, projectDescription, clientId, clientName, contact, clientAddress, projectDesigner, projectRate, pmPercent, hideHours, hideRate, sections,
       totalBilled: p.totalBilled,
     }
     let updated
@@ -141,6 +142,7 @@ export default function App() {
     setPmPercent(est.pmPercent ?? 15)
     setEstimateDate(est.estimateDate ?? new Date().toISOString().slice(0, 10))
     setEstimateNumber(est.estimateNumber ?? getNextEstimateNumber())
+    setProjectRate(est.projectRate ?? 150)
     setHideHours(est.hideHours ?? false)
     setHideRate(est.hideRate ?? false)
     setClientAddress(est.clientAddress ?? '')
@@ -172,6 +174,7 @@ export default function App() {
     setContact('')
     setProjectDesigner('stef')
     setPmPercent(15)
+    setProjectRate(150)
     setHideHours(false)
     setHideRate(false)
     setClientAddress('')
@@ -268,6 +271,7 @@ export default function App() {
     clientId, setClientId,
     contact, setContact,
     projectDesigner, setProjectDesigner,
+    projectRate, setProjectRate,
     hideHours, setHideHours,
     hideRate,  setHideRate,
     clientAddress, setClientAddress,
@@ -289,6 +293,7 @@ export default function App() {
             section={section}
             view={view}
             projectDesigner={projectDesigner}
+            projectRate={projectRate}
             hideHours={hideHours}
             hideRate={hideRate}
             onChange={u => updateSection(section.id, u)}

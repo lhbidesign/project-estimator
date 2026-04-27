@@ -6,12 +6,13 @@ export function calcLine(item, resources = DEFAULT_RESOURCES) {
     return { billed, internal: 0, gp: billed, gm: billed > 0 ? 100 : 0, rate: null, isFlat: true }
   }
   const res = resources[item.resource]
-  if (!res) return { billed: 0, internal: 0, gp: 0, gm: 0, rate: 0, isFlat: false }
-  const billed   = (Number(item.hours) || 0) * res.billedRate
-  const internal = (Number(item.hours) || 0) * res.internalRate
+  const billedRate   = Number(item.rate) || res?.billedRate || 150
+  const internalRate = res?.internalRate || 0
+  const billed   = (Number(item.hours) || 0) * billedRate
+  const internal = (Number(item.hours) || 0) * internalRate
   const gp       = billed - internal
   const gm       = billed > 0 ? (gp / billed) * 100 : 0
-  return { billed, internal, gp, gm, rate: res.billedRate, isFlat: false }
+  return { billed, internal, gp, gm, rate: billedRate, isFlat: false }
 }
 
 export function calcSection(items, resources = DEFAULT_RESOURCES) {

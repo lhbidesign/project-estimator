@@ -103,21 +103,15 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
         </div>
       )}
 
-      {/* Table header */}
-      <div className="bg-zinc-50 border-b border-zinc-200">
-        <table className="w-full">
-          <thead>
-            <tr>
-              {[['Deliverable', 'pl-5 pr-3 text-left'], ['Resource', 'pr-3 text-left'], ['Rate', 'pr-3 text-right'], ['Hrs', 'pr-3 text-right w-32'], ['Cost', 'pr-4 text-right'], ['Billed', 'pr-4 text-right'], ['GM%', 'pr-3 text-right'], ['', 'pr-3 w-8']].map(([h, cls]) => (
-                <th key={h} className={`py-2.5 text-xs font-black uppercase tracking-wider text-zinc-400 ${cls}`}
-                  style={{ fontFamily: 'var(--font-body)' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-        </table>
-      </div>
-
       <table className="w-full">
+        <thead>
+          <tr className="bg-zinc-50 border-b border-zinc-200">
+            {[['Deliverable', 'pl-5 pr-3 text-left'], ['Resource', 'pr-3 text-left'], ['Rate', 'pr-3 text-right'], ['Hrs', 'pr-3 text-right'], ['Cost', 'pr-4 text-right'], ['Billed', 'pr-4 text-right'], ['GM%', 'pr-3 text-right'], ['', 'pr-3 w-8']].map(([h, cls]) => (
+              <th key={h} className={`py-2.5 text-xs font-black uppercase tracking-wider text-zinc-400 ${cls}`}
+                style={{ fontFamily: 'var(--font-body)' }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
         <tbody>
           {section.items.length === 0 ? (
             <tr><td colSpan={8} className="pl-5 py-5 text-sm text-zinc-400 italic" style={{ fontFamily: 'var(--font-body)' }}>

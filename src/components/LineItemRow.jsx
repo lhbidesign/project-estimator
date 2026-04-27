@@ -23,7 +23,7 @@ export default function LineItemRow({ item, view, onChange, onDelete, hideHours 
         </td>
         {!hideHours && (
           <td className="py-3 pr-4 text-zinc-500 text-sm text-right tabular" style={{ fontFamily: 'var(--font-body)' }}>
-            {Number(item.hours) || 0} hrs
+            {Number(item.hours) || 0}
           </td>
         )}
         <td className="py-3 text-zinc-900 text-sm text-right tabular font-bold" style={{ fontFamily: 'var(--font-body)' }}>

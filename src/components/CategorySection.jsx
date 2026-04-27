@@ -47,7 +47,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
                 style={{ fontFamily: 'var(--font-body)' }}>Description</th>
               {!hideHours && (
                 <th className="pb-2 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
-                  style={{ fontFamily: 'var(--font-body)' }}>Hours</th>
+                  style={{ fontFamily: 'var(--font-body)' }}>Hrs</th>
               )}
               <th className="pb-2 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
                 style={{ fontFamily: 'var(--font-body)' }}>Cost</th>

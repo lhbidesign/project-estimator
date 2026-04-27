@@ -2,8 +2,8 @@
 
 @layer base {
   :root {
-    --font-display: 'Manrope', system-ui, sans-serif;
-    --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-display: 'allotrope', system-ui, sans-serif;
+    --font-body:    'Spline Sans Mono', monospace;
     --lime:         #CCFF00;
     --page-bg:      #f5f7f2;
   }

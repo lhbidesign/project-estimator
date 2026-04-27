@@ -65,6 +65,9 @@ export default function LineItemRow({ item, view, onChange, onDelete, hideHours,
           ))}
         </select>
       </td>
+      <td className="py-2.5 pr-3 text-right text-zinc-500 text-sm tabular" style={{ fontFamily: 'var(--font-body)' }}>
+        {isFlat ? 'Flat' : rate ? `$${rate}/hr` : '—'}
+      </td>
       <td className="py-2.5 pr-3 w-32">
         <div className="flex items-center gap-1.5">
           {isFlat ? (

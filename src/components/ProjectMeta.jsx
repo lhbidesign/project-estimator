@@ -299,7 +299,7 @@ export default function ProjectMeta({
         {estimateNumber && (
           <>
             <span className="text-zinc-200 text-sm">|</span>
-            <span className="text-xs font-black text-zinc-400 tabular" style={{ fontFamily: 'var(--font-body)' }}>
+            <span className="text-xs font-black font-mono bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded" style={{ fontFamily: 'var(--font-body)' }}>
               {estimateNumber}
             </span>
           </>

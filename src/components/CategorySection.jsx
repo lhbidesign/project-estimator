@@ -44,14 +44,14 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
           </colgroup>
           <thead>
             <tr className="border-b border-zinc-200">
-              <th className="pb-2 text-left text-xs font-black uppercase tracking-widest text-zinc-400"
+              <th className="pb-2 pr-4 text-left text-xs font-black uppercase tracking-widest text-zinc-400"
                 style={{ fontFamily: 'var(--font-body)' }}>Description</th>
               {!hideRate && (
-                <th className="pb-2 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
+                <th className="pb-2 pr-4 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
                   style={{ fontFamily: 'var(--font-body)' }}>Rate</th>
               )}
               {!hideHours && (
-                <th className="pb-2 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
+                <th className="pb-2 pr-4 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
                   style={{ fontFamily: 'var(--font-body)' }}>Hrs</th>
               )}
               <th className="pb-2 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
@@ -108,7 +108,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
         <table className="w-full">
           <thead>
             <tr>
-              {[['Deliverable', 'pl-5 pr-3 text-left'], ['Resource', 'pr-3 text-left'], ['Hrs', 'pr-3 text-right w-20'], ['Cost', 'pr-4 text-right'], ['Billed', 'pr-4 text-right'], ['GM%', 'pr-3 text-right'], ['', 'pr-3 w-8']].map(([h, cls]) => (
+              {[['Deliverable', 'pl-5 pr-3 text-left'], ['Resource', 'pr-3 text-left'], ['Rate', 'pr-3 text-right'], ['Hrs', 'pr-3 text-right w-32'], ['Cost', 'pr-4 text-right'], ['Billed', 'pr-4 text-right'], ['GM%', 'pr-3 text-right'], ['', 'pr-3 w-8']].map(([h, cls]) => (
                 <th key={h} className={`py-2.5 text-xs font-black uppercase tracking-wider text-zinc-400 ${cls}`}
                   style={{ fontFamily: 'var(--font-body)' }}>{h}</th>
               ))}
@@ -120,7 +120,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
       <table className="w-full">
         <tbody>
           {section.items.length === 0 ? (
-            <tr><td colSpan={7} className="pl-5 py-5 text-sm text-zinc-400 italic" style={{ fontFamily: 'var(--font-body)' }}>
+            <tr><td colSpan={8} className="pl-5 py-5 text-sm text-zinc-400 italic" style={{ fontFamily: 'var(--font-body)' }}>
               Add a deliverable below
             </td></tr>
           ) : section.items.map(item => (

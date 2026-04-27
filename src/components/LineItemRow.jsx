@@ -10,7 +10,7 @@ const GM_PILL = {
 export default function LineItemRow({ item, view, onChange, onDelete, hideHours, hideRate }) {
   const { resources } = useRates()
   const { billed, internal, gm, rate, isFlat } = calcLine(item, resources)
-  const mc = marginColor(isFlat ? 0 : gm)
+  const mc = marginColor(gm)
 
   function set(field, value) { onChange({ ...item, [field]: value }) }
   function toggleFlat() {
@@ -75,7 +75,7 @@ export default function LineItemRow({ item, view, onChange, onDelete, hideHours,
               className="focus-light px-2 py-1 rounded text-[10px] font-black uppercase tracking-wide bg-zinc-800 text-white border border-zinc-800 transition-all"
               style={{ fontFamily: 'var(--font-body)' }}
             >
-              Flat
+              FR
             </button>
           ) : (
             <>
@@ -92,28 +92,19 @@ export default function LineItemRow({ item, view, onChange, onDelete, hideHours,
               <button
                 onClick={toggleFlat}
                 title="Switch to flat rate"
-                className="focus-light text-zinc-300 hover:text-zinc-600 text-xs px-1 transition-colors"
+                className="focus-light text-zinc-300 hover:text-zinc-600 text-xs font-bold px-1 transition-colors"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                F
+                FR
               </button>
             </>
           )}
         </div>
       </td>
-      {/* Hrs — clean input only, flat shows $ amount */}
+      {/* Hrs — number input for hourly, dash for flat */}
       <td className="py-2.5 pr-3 w-24">
         {isFlat ? (
-          <div className="relative">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none">$</span>
-            <input
-              type="number" min="0"
-              value={item.flatAmount ?? 0}
-              onChange={e => set('flatAmount', e.target.value)}
-              className="focus-light border border-zinc-200 text-zinc-800 text-sm font-semibold text-right rounded-lg pl-5 pr-2 py-1.5 w-full outline-none focus:border-zinc-900 tabular bg-white"
-              style={{ fontFamily: 'var(--font-body)' }}
-            />
-          </div>
+          <span className="text-zinc-300 text-sm flex justify-end pr-1">—</span>
         ) : (
           <input
             type="number" min="0" step="0.5"
@@ -124,14 +115,43 @@ export default function LineItemRow({ item, view, onChange, onDelete, hideHours,
           />
         )}
       </td>
-      <td className="py-2.5 pr-4 text-right text-zinc-400 text-sm tabular" style={{ fontFamily: 'var(--font-body)' }}>
-        {isFlat ? '—' : fmt(internal)}
+      {/* Cost — editable for flat, calculated for hourly */}
+      <td className="py-2.5 pr-4 text-right tabular" style={{ fontFamily: 'var(--font-body)' }}>
+        {isFlat ? (
+          <div className="relative inline-flex justify-end">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 text-[10px] pointer-events-none">$</span>
+            <input
+              type="number" min="0"
+              value={item.flatCost ?? 0}
+              onChange={e => set('flatCost', e.target.value)}
+              className="focus-light border border-zinc-200 text-zinc-400 text-sm font-medium text-right rounded-lg pl-4 pr-2 py-1 w-24 outline-none focus:border-zinc-900 tabular bg-white"
+              style={{ fontFamily: 'var(--font-body)' }}
+            />
+          </div>
+        ) : (
+          <span className="text-zinc-400 text-sm">{fmt(internal)}</span>
+        )}
       </td>
-      <td className="py-2.5 pr-4 text-right text-zinc-900 text-sm tabular font-bold" style={{ fontFamily: 'var(--font-body)' }}>
-        {fmt(billed)}
+      {/* Billed — editable for flat, calculated for hourly */}
+      <td className="py-2.5 pr-4 text-right tabular" style={{ fontFamily: 'var(--font-body)' }}>
+        {isFlat ? (
+          <div className="relative inline-flex justify-end">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 text-[10px] pointer-events-none">$</span>
+            <input
+              type="number" min="0"
+              value={item.flatAmount ?? 0}
+              onChange={e => set('flatAmount', e.target.value)}
+              className="focus-light border border-zinc-200 text-zinc-900 text-sm font-bold text-right rounded-lg pl-4 pr-2 py-1 w-24 outline-none focus:border-zinc-900 tabular bg-white"
+              style={{ fontFamily: 'var(--font-body)' }}
+            />
+          </div>
+        ) : (
+          <span className="text-zinc-900 text-sm font-bold">{fmt(billed)}</span>
+        )}
       </td>
+      {/* GM% — always shown */}
       <td className="py-2.5 pr-3">
-        {!isFlat && (
+        {gm > 0 && (
           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold tabular float-right ${GM_PILL[mc]}`}
             style={{ fontFamily: 'var(--font-body)' }}>
             {fmtPct(gm)}

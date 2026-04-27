@@ -2,8 +2,11 @@ import { RESOURCES as DEFAULT_RESOURCES, PM_RATE as DEFAULT_PM_RATE } from '../d
 
 export function calcLine(item, resources = DEFAULT_RESOURCES) {
   if (item.isFlat) {
-    const billed = Number(item.flatAmount) || 0
-    return { billed, internal: 0, gp: billed, gm: billed > 0 ? 100 : 0, rate: null, isFlat: true }
+    const billed   = Number(item.flatAmount) || 0
+    const internal = Number(item.flatCost)   || 0
+    const gp = billed - internal
+    const gm = billed > 0 ? (gp / billed) * 100 : 0
+    return { billed, internal, gp, gm, rate: null, isFlat: true }
   }
   const res = resources[item.resource]
   const billedRate   = Number(item.rate) || res?.billedRate || 150

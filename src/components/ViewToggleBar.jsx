@@ -65,7 +65,7 @@ export default function ViewToggleBar({ view, setView, onOpenEstimates, savedCou
             )}
           </button>
 
-          <PresetLoader onLoad={onLoadPreset} variant="light" />
+          <div className="hidden sm:block"><PresetLoader onLoad={onLoadPreset} variant="light" /></div>
         </div>
       )}
     </div>

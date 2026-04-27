@@ -66,13 +66,24 @@ export default function ProjectMeta({
 
   return (
     <div className="mb-6">
-      {/* Row 1: project name + undo/redo/reset/save + estimate date (right) */}
+      {/* Project name — full width on mobile, inline on desktop */}
+      <input
+        value={projectName}
+        onChange={e => setProjectName(e.target.value)}
+        placeholder="Project name"
+        className={`focus-light w-full sm:w-auto bg-transparent text-2xl sm:text-3xl font-black text-zinc-900 placeholder-zinc-400 border-none outline-none mb-3 sm:mb-0 block sm:hidden ${saveError === 'name' ? 'placeholder-red-400' : ''}`}
+        style={{ fontFamily: 'var(--font-display)' }}
+        aria-label="Project name"
+      />
+
+      {/* Row 1: actions + estimate date */}
       <div className="flex items-center gap-2 mb-4">
+        {/* Desktop-only project name inline */}
         <input
           value={projectName}
           onChange={e => setProjectName(e.target.value)}
           placeholder="Project name"
-          className={`focus-light flex-1 bg-transparent text-2xl sm:text-3xl font-black text-zinc-900 placeholder-zinc-400 border-none outline-none min-w-0 ${saveError === 'name' ? 'placeholder-red-400' : ''}`}
+          className={`focus-light hidden sm:block flex-1 bg-transparent text-3xl font-black text-zinc-900 placeholder-zinc-400 border-none outline-none min-w-0 ${saveError === 'name' ? 'placeholder-red-400' : ''}`}
           style={{ fontFamily: 'var(--font-display)' }}
           aria-label="Project name"
         />
@@ -80,14 +91,14 @@ export default function ProjectMeta({
         {/* Undo / Redo */}
         <button
           onClick={onUndo} disabled={!canUndo}
-          className="focus-light w-8 h-8 rounded-lg flex items-center justify-center border border-zinc-300 bg-white text-zinc-700 hover:text-zinc-950 hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+          className="focus-light w-9 h-9 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center border border-zinc-300 bg-white text-zinc-700 hover:text-zinc-950 hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
           aria-label="Undo" title="Undo (⌘Z)"
         >
           <UndoIcon />
         </button>
         <button
           onClick={onRedo} disabled={!canRedo}
-          className="focus-light w-8 h-8 rounded-lg flex items-center justify-center border border-zinc-300 bg-white text-zinc-700 hover:text-zinc-950 hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+          className="focus-light w-9 h-9 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center border border-zinc-300 bg-white text-zinc-700 hover:text-zinc-950 hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
           aria-label="Redo" title="Redo (⌘⇧Z)"
         >
           <RedoIcon />
@@ -97,7 +108,7 @@ export default function ProjectMeta({
 
         <button
           onClick={onReset}
-          className="focus-light text-xs font-bold uppercase tracking-wider text-zinc-400 hover:text-zinc-700 border border-zinc-200 hover:border-zinc-400 px-3 py-1.5 rounded-lg transition-all"
+          className="focus-light text-xs font-bold uppercase tracking-wider text-zinc-400 hover:text-zinc-700 border border-zinc-200 hover:border-zinc-400 px-3 py-2 sm:py-1.5 rounded-lg transition-all"
           style={{ fontFamily: 'var(--font-body)' }}
         >
           Reset
@@ -105,7 +116,7 @@ export default function ProjectMeta({
         <div className="flex flex-col items-end gap-0.5">
           <button
             onClick={onSave}
-            className="focus-light text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-lg transition-all"
+            className="focus-light text-xs font-bold uppercase tracking-wider px-4 py-2 sm:py-1.5 rounded-lg transition-all"
             style={{
               fontFamily: 'var(--font-body)',
               ...(justSaved
@@ -123,15 +134,15 @@ export default function ProjectMeta({
           )}
         </div>
 
-        {/* Estimate Date — right-aligned on desktop */}
-        <div className="flex items-center gap-2 sm:ml-4 sm:pl-4 sm:border-l sm:border-zinc-200">
-          <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
+        {/* Estimate Date */}
+        <div className="flex items-center gap-2 ml-auto sm:ml-4 sm:pl-4 sm:border-l sm:border-zinc-200">
+          <span className="hidden sm:inline text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
             style={{ fontFamily: 'var(--font-body)' }}>Estimate Date</span>
           <input
             type="date"
             value={estimateDate}
             onChange={e => setEstimateDate(e.target.value)}
-            className="focus-light border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-700 bg-white outline-none focus:border-zinc-900 cursor-pointer"
+            className="focus-light border border-zinc-200 rounded-lg px-2 sm:px-3 py-1.5 text-sm font-semibold text-zinc-700 bg-white outline-none focus:border-zinc-900 cursor-pointer"
             style={{ fontFamily: 'var(--font-body)' }}
           />
         </div>

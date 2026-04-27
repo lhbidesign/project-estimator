@@ -20,11 +20,13 @@ export default function SummaryPanel({ sections, pmPercent, setPmPercent, view }
     return (
       <div className="mt-6 pt-6 border-t-2 border-zinc-200">
         <div className="max-w-xs ml-auto space-y-2">
-          <SRow label="Subtotal" value={fmt(p.subtotal)} />
           {pmPercent > 0 && (
-            <SRow label={`Project Management (${pmPercent}%)`} value={fmt(p.pmBilled)} />
+            <>
+              <SRow label="Subtotal" value={fmt(p.subtotal)} />
+              <SRow label={`Project Management (${pmPercent}%)`} value={fmt(p.pmBilled)} />
+            </>
           )}
-          <div className="pt-3 mt-3 border-t border-zinc-200">
+          <div className={pmPercent > 0 ? 'pt-3 mt-3 border-t border-zinc-200' : ''}>
             <SRow label="Total" value={fmt(p.totalBilled)} strong />
           </div>
         </div>

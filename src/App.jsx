@@ -22,6 +22,12 @@ function loadStoredEstimates() {
   try { return JSON.parse(localStorage.getItem(ESTIMATES_KEY) ?? '[]') } catch { return [] }
 }
 
+function getNextEstimateNumber() {
+  const n = parseInt(localStorage.getItem('lh-est-counter') ?? '0', 10) + 1
+  localStorage.setItem('lh-est-counter', String(n))
+  return `EST-${String(n).padStart(4, '0')}`
+}
+
 function blankSection() { return { id: nanoid(), label: '', items: [] } }
 
 export default function App() {
@@ -45,8 +51,9 @@ export default function App() {
   const [projectDesigner,    setProjectDesigner]    = useState('stef')
   const [pmPercent,          setPmPercent]          = useState(15)
   const [hideHours,          setHideHours]          = useState(false)
+  const [hideRate,           setHideRate]           = useState(false)
   const [estimateDate,       setEstimateDate]       = useState(() => new Date().toISOString().slice(0, 10))
-  const [estimateNumber,     setEstimateNumber]     = useState(null)
+  const [estimateNumber,     setEstimateNumber]     = useState(getNextEstimateNumber)
   const [clientAddress,      setClientAddress]      = useState('')
   const [validDays,          setValidDays]          = useState(30)
   const [footerNote,         setFooterNote]         = useState('50% deposit required to initiate project. Balance due upon completion unless otherwise agreed upon in writing.')
@@ -96,27 +103,18 @@ export default function App() {
 
   const clientName = clients.find(c => c.id === clientId)?.name ?? ''
 
-  function getNextEstimateNumber() {
-    const n = parseInt(localStorage.getItem('lh-est-counter') ?? '0', 10) + 1
-    localStorage.setItem('lh-est-counter', String(n))
-    return `EST-${String(n).padStart(4, '0')}`
-  }
-
   // ── Save / Load ──
   function saveEstimate() {
     if (!projectName.trim()) { setSaveError('name'); setTimeout(() => setSaveError(''), 3000); return }
     if (!clientId)           { setSaveError('client'); setTimeout(() => setSaveError(''), 3000); return }
 
-    const p   = calcProject(sections, pmPercent, resources, pmRate)
-    const num = estimateNumber ?? getNextEstimateNumber()
-    if (!estimateNumber) setEstimateNumber(num)
-
+    const p = calcProject(sections, pmPercent, resources, pmRate)
     const est = {
       id: currentEstimateId ?? nanoid(),
       savedAt: new Date().toISOString(),
-      estimateNumber: num,
+      estimateNumber,
       estimateDate, validDays, footerNote,
-      projectName, projectDescription, clientId, clientName, contact, clientAddress, projectDesigner, pmPercent, sections,
+      projectName, projectDescription, clientId, clientName, contact, clientAddress, projectDesigner, pmPercent, hideHours, hideRate, sections,
       totalBilled: p.totalBilled,
     }
     let updated
@@ -142,7 +140,9 @@ export default function App() {
     setProjectDesigner(est.projectDesigner ?? 'stef')
     setPmPercent(est.pmPercent ?? 15)
     setEstimateDate(est.estimateDate ?? new Date().toISOString().slice(0, 10))
-    setEstimateNumber(est.estimateNumber ?? null)
+    setEstimateNumber(est.estimateNumber ?? getNextEstimateNumber())
+    setHideHours(est.hideHours ?? false)
+    setHideRate(est.hideRate ?? false)
     setClientAddress(est.clientAddress ?? '')
     setValidDays(est.validDays ?? 30)
     setFooterNote(est.footerNote ?? '50% deposit required to initiate project. Balance due upon completion unless otherwise agreed upon in writing.')
@@ -173,11 +173,12 @@ export default function App() {
     setProjectDesigner('stef')
     setPmPercent(15)
     setHideHours(false)
+    setHideRate(false)
     setClientAddress('')
     setValidDays(30)
     setFooterNote('50% deposit required to initiate project. Balance due upon completion unless otherwise agreed upon in writing.')
     setEstimateDate(new Date().toISOString().slice(0, 10))
-    setEstimateNumber(null)
+    setEstimateNumber(getNextEstimateNumber())
     resetHistory([blankSection()])
     setCurrentEstimateId(null)
   }
@@ -268,6 +269,7 @@ export default function App() {
     contact, setContact,
     projectDesigner, setProjectDesigner,
     hideHours, setHideHours,
+    hideRate,  setHideRate,
     clientAddress, setClientAddress,
     estimateDate, setEstimateDate,
     estimateNumber,
@@ -288,6 +290,7 @@ export default function App() {
             view={view}
             projectDesigner={projectDesigner}
             hideHours={hideHours}
+            hideRate={hideRate}
             onChange={u => updateSection(section.id, u)}
             onDeleteSection={() => deleteSection(section.id)}
             isOnlySection={sections.length === 1}
@@ -480,9 +483,13 @@ export default function App() {
                     {clientAddress}
                   </p>
                 )}
-                <p className="text-zinc-400 text-xs mt-3 font-mono">
-                  {[estimateNumber, formattedDate].filter(Boolean).join(' · ')}
-                </p>
+                <div className="mt-3 flex items-center gap-3">
+                  <span className="text-xs font-black font-mono text-zinc-900 bg-zinc-100 px-2 py-0.5 rounded"
+                    style={{ fontFamily: 'var(--font-body)' }}>
+                    {estimateNumber}
+                  </span>
+                  <span className="text-zinc-400 text-xs font-mono">{formattedDate}</span>
+                </div>
                 {expiryDate && (
                   <p className="text-zinc-400 text-xs mt-0.5" style={{ fontFamily: 'var(--font-body)' }}>
                     Valid through {expiryDate}

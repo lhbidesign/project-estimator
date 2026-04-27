@@ -12,7 +12,7 @@ function newItem(categoryId, name, projectDesigner) {
   return { id: nanoid(), name, resource: defaultResource(categoryId, projectDesigner), hours: 8, category: categoryId }
 }
 
-export default function CategorySection({ section, view, onChange, onDeleteSection, isOnlySection, projectDesigner, hideHours }) {
+export default function CategorySection({ section, view, onChange, onDeleteSection, isOnlySection, projectDesigner, hideHours, hideRate }) {
   const { resources } = useRates()
   const totals = calcSection(section.items, resources)
 
@@ -38,19 +38,24 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
         <table className="w-full">
           <colgroup>
             <col />
-            {!hideHours && <col className="w-20" />}
+            {!hideRate  && <col className="w-28" />}
+            {!hideHours && <col className="w-16" />}
             <col className="w-32" />
           </colgroup>
           <thead>
             <tr className="border-b border-zinc-200">
               <th className="pb-2 text-left text-xs font-black uppercase tracking-widest text-zinc-400"
                 style={{ fontFamily: 'var(--font-body)' }}>Description</th>
+              {!hideRate && (
+                <th className="pb-2 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
+                  style={{ fontFamily: 'var(--font-body)' }}>Rate</th>
+              )}
               {!hideHours && (
                 <th className="pb-2 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
                   style={{ fontFamily: 'var(--font-body)' }}>Hrs</th>
               )}
               <th className="pb-2 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
-                style={{ fontFamily: 'var(--font-body)' }}>Cost</th>
+                style={{ fontFamily: 'var(--font-body)' }}>Total</th>
             </tr>
           </thead>
           <tbody>
@@ -58,7 +63,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
               <LineItemRow
                 key={item.id} item={item} view="client"
                 onChange={() => {}} onDelete={() => {}}
-                hideHours={hideHours}
+                hideHours={hideHours} hideRate={hideRate}
               />
             ))}
           </tbody>

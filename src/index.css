@@ -43,6 +43,7 @@
   .print-show  { display: block !important; }
   nav          { display: none !important; }
   main         { padding-top: 0 !important; }
+  main > div   { padding-top: 0 !important; }
 
   html, body { background: #fff !important; }
 

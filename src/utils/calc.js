@@ -1,13 +1,17 @@
 import { RESOURCES as DEFAULT_RESOURCES, PM_RATE as DEFAULT_PM_RATE } from '../data/rates.js'
 
 export function calcLine(item, resources = DEFAULT_RESOURCES) {
+  if (item.isFlat) {
+    const billed = Number(item.flatAmount) || 0
+    return { billed, internal: 0, gp: billed, gm: billed > 0 ? 100 : 0, rate: null, isFlat: true }
+  }
   const res = resources[item.resource]
-  if (!res || !item.hours) return { billed: 0, internal: 0, gp: 0, gm: 0 }
-  const billed   = Number(item.hours) * res.billedRate
-  const internal = Number(item.hours) * res.internalRate
+  if (!res) return { billed: 0, internal: 0, gp: 0, gm: 0, rate: 0, isFlat: false }
+  const billed   = (Number(item.hours) || 0) * res.billedRate
+  const internal = (Number(item.hours) || 0) * res.internalRate
   const gp       = billed - internal
   const gm       = billed > 0 ? (gp / billed) * 100 : 0
-  return { billed, internal, gp, gm }
+  return { billed, internal, gp, gm, rate: res.billedRate, isFlat: false }
 }
 
 export function calcSection(items, resources = DEFAULT_RESOURCES) {

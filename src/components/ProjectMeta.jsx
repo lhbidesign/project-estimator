@@ -37,6 +37,7 @@ export default function ProjectMeta({
   clientAddress, setClientAddress,
   projectDesigner, setProjectDesigner,
   hideHours, setHideHours,
+  hideRate,  setHideRate,
   estimateDate, setEstimateDate,
   estimateNumber,
   validDays, setValidDays,
@@ -304,21 +305,35 @@ export default function ProjectMeta({
           </>
         )}
 
-        {/* Hide hours toggle */}
-        <label className="flex items-center gap-2 ml-auto cursor-pointer">
-          <div
-            onClick={() => setHideHours(v => !v)}
-            className={`relative rounded-full transition-colors cursor-pointer flex-shrink-0 ${hideHours ? 'bg-zinc-800' : 'bg-zinc-200'}`}
-            style={{ height: '18px', width: '32px' }}
-            role="switch"
-            aria-checked={hideHours}
-          >
-            <div className={`absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white shadow-sm transition-transform duration-200 ${hideHours ? 'translate-x-4' : 'translate-x-0.5'}`} />
-          </div>
-          <span className="text-xs font-semibold text-zinc-500 select-none" style={{ fontFamily: 'var(--font-body)' }}>
-            Hide hours in client view
-          </span>
-        </label>
+        {/* Toggles — right-aligned */}
+        <div className="flex items-center gap-4 ml-auto">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <div
+              onClick={() => setHideRate(v => !v)}
+              className={`relative rounded-full transition-colors cursor-pointer flex-shrink-0 ${hideRate ? 'bg-zinc-800' : 'bg-zinc-200'}`}
+              style={{ height: '18px', width: '32px' }}
+              role="switch" aria-checked={hideRate}
+            >
+              <div className={`absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white shadow-sm transition-transform duration-200 ${hideRate ? 'translate-x-4' : 'translate-x-0.5'}`} />
+            </div>
+            <span className="text-xs font-semibold text-zinc-500 select-none" style={{ fontFamily: 'var(--font-body)' }}>
+              Hide rate
+            </span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <div
+              onClick={() => setHideHours(v => !v)}
+              className={`relative rounded-full transition-colors cursor-pointer flex-shrink-0 ${hideHours ? 'bg-zinc-800' : 'bg-zinc-200'}`}
+              style={{ height: '18px', width: '32px' }}
+              role="switch" aria-checked={hideHours}
+            >
+              <div className={`absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white shadow-sm transition-transform duration-200 ${hideHours ? 'translate-x-4' : 'translate-x-0.5'}`} />
+            </div>
+            <span className="text-xs font-semibold text-zinc-500 select-none" style={{ fontFamily: 'var(--font-body)' }}>
+              Hide hours
+            </span>
+          </label>
+        </div>
       </div>
     </div>
   )

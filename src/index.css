@@ -41,9 +41,11 @@
 @media print {
   .no-print    { display: none !important; }
   .print-show  { display: block !important; }
-  body         { background: #fff !important; color: #111 !important; }
   nav          { display: none !important; }
   main         { padding-top: 0 !important; }
+
+  /* Warm beige page background */
+  html, body { background: #f7f5ed !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 
   /* Force near-black text on all print content */
   main *, .print-show * { color: #111 !important; }
@@ -61,8 +63,10 @@
     right: 0;
     padding: 10px 32px;
     border-top: 1px solid #bbb;
-    background: #fff;
+    background: #f7f5ed;
     justify-content: space-between;
     align-items: center;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 }

@@ -332,7 +332,7 @@ export default function App() {
         footerNote && (
           <div className="mt-8 pt-6 border-t border-zinc-100">
             <p className="text-xs text-zinc-500 leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
-              {footerNote}
+              <span className="font-bold text-zinc-700">Note:</span> {footerNote}
             </p>
           </div>
         )
@@ -342,7 +342,7 @@ export default function App() {
       {view === 'client' && (
         <div className="no-print mt-6 pt-5 border-t border-zinc-100 flex items-center justify-between flex-wrap gap-2">
           <p className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
-            1616 N La Brea Ave Unit 302, Los Angeles, CA
+            1616 N La Brea Ave Unit 302, Los Angeles, CA 90028
           </p>
           <p className="text-xs text-zinc-400" style={{ fontFamily: 'var(--font-body)' }}>
             hello@littlehouse.studio
@@ -427,8 +427,13 @@ export default function App() {
                 {clientAddress}
               </p>
             )}
-            <p className="text-xs mt-3 font-mono" style={{ color: '#555' }}>
-              {[estimateNumber, formattedDate].filter(Boolean).join(' · ')}
+            {estimateNumber && (
+              <p className="text-xs mt-3 font-mono font-bold" style={{ color: '#111' }}>
+                {estimateNumber}
+              </p>
+            )}
+            <p className="text-xs mt-1 font-mono" style={{ color: '#555' }}>
+              {formattedDate}
             </p>
             {expiryDate && (
               <p className="text-xs mt-0.5" style={{ fontFamily: 'var(--font-body)', color: '#555' }}>
@@ -514,7 +519,7 @@ export default function App() {
 
       {/* Pinned footer — print only, appears on every page */}
       <div className="print-footer hidden" style={{ fontFamily: 'var(--font-body)' }}>
-        <span className="text-xs" style={{ color: '#555' }}>1616 N La Brea Ave Unit 302, Los Angeles, CA</span>
+        <span className="text-xs" style={{ color: '#555' }}>1616 N La Brea Ave Unit 302, Los Angeles, CA 90028</span>
         <span className="text-xs" style={{ color: '#555' }}>hello@littlehouse.studio</span>
       </div>
     </div>

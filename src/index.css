@@ -2,8 +2,8 @@
 
 @layer base {
   :root {
-    --font-display: 'allotrope', system-ui, sans-serif;
-    --font-body:    'Spline Sans Mono', monospace;
+    --font-display: 'Manrope', system-ui, sans-serif;
+    --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
     --lime:         #CCFF00;
     --page-bg:      #f5f7f2;
   }
@@ -44,8 +44,7 @@
   nav          { display: none !important; }
   main         { padding-top: 0 !important; }
 
-  /* Warm beige page background */
-  html, body { background: #f7f5ed !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  html, body { background: #fff !important; }
 
   /* Force near-black text on all print content */
   main *, .print-show * { color: #111 !important; }
@@ -63,10 +62,8 @@
     right: 0;
     padding: 10px 32px;
     border-top: 1px solid #bbb;
-    background: #f7f5ed;
+    background: #fff;
     justify-content: space-between;
     align-items: center;
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
   }
 }

@@ -7,7 +7,7 @@ const GM_PILL = {
   red:    'bg-red-50   text-red-700   border border-red-200',
 }
 
-export default function LineItemCard({ item, onChange, onDelete }) {
+export default function LineItemCard({ item, onChange, onDelete, onDragStart, onDrop }) {
   const { resources } = useRates()
   const { billed, internal, gm, rate, isFlat } = calcLine(item, resources)
   const mc = marginColor(gm)
@@ -18,10 +18,18 @@ export default function LineItemCard({ item, onChange, onDelete }) {
   }
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm" style={{ fontFamily: 'var(--font-body)' }}>
+    <div
+      className="bg-white border border-zinc-200 rounded-xl p-4 shadow-sm"
+      style={{ fontFamily: 'var(--font-body)' }}
+      draggable
+      onDragStart={onDragStart}
+      onDragOver={e => e.preventDefault()}
+      onDrop={onDrop}
+    >
 
-      {/* Row 1: Name + delete */}
+      {/* Row 1: Drag handle + Name + delete */}
       <div className="flex items-start gap-2 mb-3">
+        <span className="cursor-grab active:cursor-grabbing text-zinc-300 select-none mt-1 flex-shrink-0" style={{ fontSize: 16 }}>⠿</span>
         <input
           value={item.name}
           onChange={e => set('name', e.target.value)}

@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import LineItemRow from './LineItemRow.jsx'
 import LineItemCard from './LineItemCard.jsx'
 import { CATEGORIES } from '../data/rates.js'
@@ -17,8 +18,22 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
   const { resources } = useRates()
   const totals = calcSection(section.items, resources)
 
+  const dragId = useRef(null)
+
   function updateItem(id, u)  { onChange({ ...section, items: section.items.map(i => i.id === id ? u : i) }) }
   function deleteItem(id)     { onChange({ ...section, items: section.items.filter(i => i.id !== id) }) }
+
+  function handleDragStart(id) { dragId.current = id }
+  function handleDrop(targetId) {
+    if (!dragId.current || dragId.current === targetId) return
+    const items = [...section.items]
+    const from  = items.findIndex(i => i.id === dragId.current)
+    const to    = items.findIndex(i => i.id === targetId)
+    const [moved] = items.splice(from, 1)
+    items.splice(to, 0, moved)
+    onChange({ ...section, items })
+    dragId.current = null
+  }
   function addItem(catId, name = '') {
     onChange({ ...section, items: [...section.items, newItem(catId, name === 'Custom line item' ? '' : name, projectDesigner, projectRate)] })
   }
@@ -28,6 +43,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
 
   /* ── CLIENT VIEW ── */
   if (view === 'client') {
+    if (section.items.length === 0) return null
     return (
       <div className="mb-8">
         {section.label && (
@@ -145,6 +161,8 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
             key={item.id} item={item}
             onChange={u => updateItem(item.id, u)}
             onDelete={() => deleteItem(item.id)}
+            onDragStart={() => handleDragStart(item.id)}
+            onDrop={() => handleDrop(item.id)}
           />
         ))}
       </div>
@@ -154,7 +172,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
         <table className="w-full">
           <thead>
             <tr className="bg-zinc-50 border-b border-zinc-200">
-              {[['Deliverable', 'pl-5 pr-3 text-left'], ['Resource', 'pr-3 text-left'], ['Rate', 'pr-3 text-right'], ['Hrs', 'pr-3 text-right'], ['Cost', 'pr-4 text-right'], ['Billed', 'pr-4 text-right'], ['GM%', 'pr-3 text-right'], ['', 'pr-3 w-8']].map(([h, cls]) => (
+              {[['', 'w-5 pl-2'], ['Deliverable', 'pl-1 pr-3 text-left'], ['Resource', 'pr-3 text-left'], ['Rate', 'pr-3 text-right'], ['Hrs', 'pr-3 text-right'], ['Cost', 'pr-4 text-right'], ['Billed', 'pr-4 text-right'], ['GM%', 'pr-3 text-right'], ['', 'pr-3 w-8']].map(([h, cls]) => (
                 <th key={h} className={`py-2.5 text-xs font-black uppercase tracking-wider text-zinc-400 ${cls}`}
                   style={{ fontFamily: 'var(--font-body)' }}>{h}</th>
               ))}
@@ -162,7 +180,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
           </thead>
           <tbody>
             {section.items.length === 0 ? (
-              <tr><td colSpan={8} className="pl-5 py-5 text-sm text-zinc-400 italic" style={{ fontFamily: 'var(--font-body)' }}>
+              <tr><td colSpan={9} className="pl-5 py-5 text-sm text-zinc-400 italic" style={{ fontFamily: 'var(--font-body)' }}>
                 Add a deliverable below
               </td></tr>
             ) : section.items.map(item => (
@@ -170,6 +188,8 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
                 key={item.id} item={item} view="internal"
                 onChange={u => updateItem(item.id, u)}
                 onDelete={() => deleteItem(item.id)}
+                onDragStart={() => handleDragStart(item.id)}
+                onDrop={() => handleDrop(item.id)}
               />
             ))}
           </tbody>

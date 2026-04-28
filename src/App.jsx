@@ -405,13 +405,16 @@ export default function App() {
   }
 
   // ── CLIENT VIEW ──
-  const formattedDate = estimateDate
-    ? new Date(estimateDate + 'T12:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-    : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  function fmtLongDate(d) {
+    const month = d.toLocaleDateString('en-US', { month: 'long' })
+    return `${month} ${d.getDate()}, ${d.getFullYear()}`
+  }
+  const formattedDate = fmtLongDate(estimateDate
+    ? new Date(estimateDate + 'T12:00:00')
+    : new Date())
 
   const expiryDate = estimateDate
-    ? new Date(new Date(estimateDate + 'T12:00:00').getTime() + validDays * 864e5)
-        .toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    ? fmtLongDate(new Date(new Date(estimateDate + 'T12:00:00').getTime() + validDays * 864e5))
     : null
 
   return (

@@ -50,6 +50,7 @@ export default function App() {
   const [clientId,           setClientId]           = useState('')
   const [contact,            setContact]            = useState('')
   const [projectDesigner,    setProjectDesigner]    = useState('stef')
+  const [timeline,           setTimeline]           = useState('')
   const [pmPercent,          setPmPercent]          = useState(0)
   const [projectRate,        setProjectRate]        = useState(150)
   const [hideHours,          setHideHours]          = useState(false)
@@ -116,7 +117,7 @@ export default function App() {
       savedAt: new Date().toISOString(),
       estimateNumber,
       estimateDate, validDays, footerNote,
-      projectName, projectDescription, clientId, clientName, contact, clientAddress, projectDesigner, projectRate, pmPercent, hideHours, hideRate, sections,
+      projectName, projectDescription, clientId, clientName, contact, clientAddress, projectDesigner, projectRate, pmPercent, hideHours, hideRate, timeline, sections,
       totalBilled: p.totalBilled,
     }
     let updated
@@ -140,6 +141,7 @@ export default function App() {
     setProjectDescription(est.projectDescription ?? '')
     setContact(est.contact ?? '')
     setProjectDesigner(est.projectDesigner ?? 'stef')
+    setTimeline(est.timeline ?? '')
     setPmPercent(est.pmPercent ?? 0)
     setEstimateDate(est.estimateDate ?? new Date().toISOString().slice(0, 10))
     setEstimateNumber(est.estimateNumber ?? getNextEstimateNumber())
@@ -174,6 +176,7 @@ export default function App() {
     setClientId('')
     setContact('')
     setProjectDesigner('stef')
+    setTimeline('')
     setPmPercent(0)
     setProjectRate(150)
     setHideHours(false)
@@ -326,9 +329,36 @@ export default function App() {
         view={view}
       />
 
-      {/* Footer note — editable in internal, display-only in client */}
+      {/* Estimated Timeline */}
       {view === 'internal' ? (
         <div className="mt-8 pt-6 border-t border-zinc-200">
+          <label className="block text-xs font-black uppercase tracking-widest text-zinc-400 mb-2"
+            style={{ fontFamily: 'var(--font-body)' }}>
+            Estimated Timeline
+          </label>
+          <input
+            value={timeline}
+            onChange={e => setTimeline(e.target.value)}
+            placeholder="e.g. 1 week, 2–4 weeks, 3 days…"
+            className="focus-light w-full text-sm text-zinc-600 bg-white border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:border-zinc-900 shadow-sm placeholder-zinc-300"
+            style={{ fontFamily: 'var(--font-body)' }}
+          />
+        </div>
+      ) : (
+        timeline && (
+          <div className="mt-8 pt-6 border-t border-zinc-100">
+            <p className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-1"
+              style={{ fontFamily: 'var(--font-body)' }}>Estimated Timeline</p>
+            <p className="text-sm font-semibold text-zinc-800" style={{ fontFamily: 'var(--font-body)' }}>
+              {timeline}
+            </p>
+          </div>
+        )
+      )}
+
+      {/* Footer note — editable in internal, display-only in client */}
+      {view === 'internal' ? (
+        <div className="mt-6 pt-6 border-t border-zinc-200">
           <label className="block text-xs font-black uppercase tracking-widest text-zinc-400 mb-2"
             style={{ fontFamily: 'var(--font-body)' }}>
             Terms / Footer Note
@@ -344,7 +374,7 @@ export default function App() {
         </div>
       ) : (
         footerNote && (
-          <div className="mt-8 pt-6 border-t border-zinc-100">
+          <div className="mt-6 pt-6 border-t border-zinc-100">
             <p className="text-xs text-zinc-500 leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
               <span className="font-bold text-zinc-700">Note:</span> {footerNote}
             </p>

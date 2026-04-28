@@ -431,33 +431,30 @@ export default function App() {
               {projectName || 'Project Estimate'}
             </h1>
             {projectDescription && (
-              <p className="text-sm font-medium mb-3" style={{ fontFamily: 'var(--font-body)', color: '#444' }}>
+              <p className="text-sm font-medium mb-2" style={{ fontFamily: 'var(--font-body)', color: '#555' }}>
                 {projectDescription}
               </p>
             )}
             {(clientName || contact) && (
-              <p className="text-sm font-semibold" style={{ fontFamily: 'var(--font-body)', color: '#222' }}>
+              <p className="text-sm font-bold mt-1" style={{ fontFamily: 'var(--font-body)', color: '#111' }}>
                 {[clientName, contact].filter(Boolean).join(' · ')}
               </p>
             )}
             {clientAddress && (
-              <p className="text-sm mt-0.5 whitespace-pre-line" style={{ fontFamily: 'var(--font-body)', color: '#444' }}>
+              <p className="text-xs mt-0.5 whitespace-pre-line" style={{ fontFamily: 'var(--font-body)', color: '#555' }}>
                 {clientAddress}
               </p>
             )}
-            {estimateNumber && (
-              <p className="text-xs mt-3 font-mono font-bold" style={{ color: '#111' }}>
-                {estimateNumber}
+            <div className="mt-4 pt-3" style={{ borderTop: '1px solid #e0e0e0' }}>
+              {estimateNumber && (
+                <p className="text-xs font-bold mb-0.5" style={{ fontFamily: 'var(--font-body)', color: '#111' }}>
+                  {estimateNumber}
+                </p>
+              )}
+              <p className="text-xs" style={{ fontFamily: 'var(--font-body)', color: '#555' }}>
+                {formattedDate}{expiryDate ? ` · Valid through ${expiryDate}` : ''}
               </p>
-            )}
-            <p className="text-xs mt-1 font-mono" style={{ color: '#555' }}>
-              {formattedDate}
-            </p>
-            {expiryDate && (
-              <p className="text-xs mt-0.5" style={{ fontFamily: 'var(--font-body)', color: '#555' }}>
-                Valid through {expiryDate}
-              </p>
-            )}
+            </div>
           </div>
           <div className="flex flex-col items-end gap-1 flex-shrink-0">
             <img src={`${import.meta.env.BASE_URL}lhbi-logo.png`} alt="Little House Studio"

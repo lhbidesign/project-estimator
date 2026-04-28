@@ -456,7 +456,7 @@ export default function App() {
       <div className="hidden print-show px-8 pt-8 pb-6 print-border-heavy" style={{ borderBottom: '2px solid #111' }}>
         <div className="flex items-start justify-between gap-8">
           <div className="flex-1">
-            <h1 className="text-4xl font-black leading-tight mb-1"
+            <h1 className="text-4xl font-black leading-none mb-1"
               style={{ fontFamily: 'var(--font-display)', color: '#111' }}>
               {projectName || 'Project Estimate'}
             </h1>
@@ -511,7 +511,7 @@ export default function App() {
 
               {/* Left: project + client info */}
               <div className="flex-1">
-                <h1 className="text-2xl sm:text-4xl font-black text-zinc-900 leading-tight mb-0.5"
+                <h1 className="text-2xl sm:text-4xl font-black text-zinc-900 leading-none mb-0.5"
                   style={{ fontFamily: 'var(--font-display)' }}>
                   {projectName || 'Project Estimate'}
                 </h1>

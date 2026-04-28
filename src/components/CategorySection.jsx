@@ -70,17 +70,17 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
           </colgroup>
           <thead>
             <tr className="border-b border-zinc-200">
-              <th className="pb-2 pr-4 text-left text-xs font-black uppercase tracking-widest text-zinc-400"
+              <th className="pt-3 pb-3 print:pt-6 pr-4 text-left text-xs font-black uppercase tracking-widest text-zinc-400"
                 style={{ fontFamily: 'var(--font-body)' }}>Description</th>
               {!hideRate && (
-                <th className="hidden sm:table-cell pb-2 pr-4 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
+                <th className="hidden sm:table-cell pt-3 pb-3 print:pt-6 pr-4 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
                   style={{ fontFamily: 'var(--font-body)' }}>Rate</th>
               )}
               {!hideHours && (
-                <th className="pb-2 pr-4 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
+                <th className="pt-3 pb-3 print:pt-6 pr-4 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
                   style={{ fontFamily: 'var(--font-body)' }}>Hrs</th>
               )}
-              <th className="pb-2 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
+              <th className="pt-3 pb-3 print:pt-6 text-right text-xs font-black uppercase tracking-widest text-zinc-400"
                 style={{ fontFamily: 'var(--font-body)' }}>Total</th>
             </tr>
           </thead>

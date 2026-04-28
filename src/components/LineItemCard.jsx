@@ -24,12 +24,12 @@ export default function LineItemCard({ item, onChange, onDelete, onDragStart, on
       onDragStart={onDragStart}
       onDragOver={e => { e.preventDefault(); onDragOver?.() }}
       onDragLeave={onDragLeave}
-      onDrop={onDrop}
+      onDrop={e => { e.preventDefault(); onDrop?.() }}
       onDragEnd={onDragEnd}
       style={{
         fontFamily: 'var(--font-body)',
-        border: isDragOver ? '2px solid #CCFF00' : '1px solid #e4e4e7',
-        background: isDragOver ? 'rgba(204,255,0,0.05)' : 'white',
+        border: isDragOver ? '2px solid #2563EB' : '1px solid #e4e4e7',
+        background: isDragOver ? 'rgba(37,99,235,0.04)' : 'white',
         opacity: isDragging ? 0.35 : 1,
         transform: isDragOver ? 'scale(1.01)' : 'scale(1)',
         transition: 'opacity 0.15s ease, transform 0.12s ease, border-color 0.1s ease, background 0.1s ease',

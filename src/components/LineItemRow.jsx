@@ -49,13 +49,13 @@ export default function LineItemRow({ item, view, onChange, onDelete, hideHours,
       onDragStart={onDragStart}
       onDragOver={e => { e.preventDefault(); onDragOver?.() }}
       onDragLeave={onDragLeave}
-      onDrop={onDrop}
+      onDrop={e => { e.preventDefault(); onDrop?.() }}
       onDragEnd={onDragEnd}
       style={{
         opacity: isDragging ? 0.35 : 1,
         transition: 'opacity 0.15s ease',
-        boxShadow: isDragOver ? 'inset 0 2px 0 0 #CCFF00' : 'none',
-        background: isDragOver ? 'rgba(204,255,0,0.06)' : undefined,
+        boxShadow: isDragOver ? 'inset 0 2px 0 0 #2563EB' : 'none',
+        background: isDragOver ? 'rgba(37,99,235,0.04)' : undefined,
       }}
     >
       {/* Drag handle */}

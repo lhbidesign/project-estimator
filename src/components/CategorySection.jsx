@@ -18,32 +18,54 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
   const { resources } = useRates()
   const totals = calcSection(section.items, resources)
 
-  const dragId    = useRef(null)
-  const [draggingId, setDraggingId] = useState(null)
-  const [dragOverId, setDragOverId] = useState(null)
+  const dragId         = useRef(null)
+  const dragOverIdRef  = useRef(null)       // dedupe rapid dragOver events
+  const originalItems  = useRef(null)       // restore on Escape / drag cancel
+  const didDrop        = useRef(false)
+  const [draggingId,  setDraggingId]  = useState(null)
+  const [dragOverId,  setDragOverId]  = useState(null)
 
   function updateItem(id, u) { onChange({ ...section, items: section.items.map(i => i.id === id ? u : i) }) }
   function deleteItem(id)    { onChange({ ...section, items: section.items.filter(i => i.id !== id) }) }
 
   function handleDragStart(id) {
-    dragId.current = id
+    dragId.current      = id
+    didDrop.current     = false
+    originalItems.current = [...section.items]
     setDraggingId(id)
   }
-  function handleDragOver(id) {
-    if (dragId.current && dragId.current !== id) setDragOverId(id)
-  }
-  function handleDragLeave() { setDragOverId(null) }
-  function handleDragEnd()   { setDraggingId(null); setDragOverId(null); dragId.current = null }
-  function handleDrop(targetId) {
-    setDraggingId(null); setDragOverId(null)
-    if (!dragId.current || dragId.current === targetId) { dragId.current = null; return }
+
+  function handleDragOver(targetId) {
+    if (!dragId.current || dragId.current === targetId) return
+    if (dragOverIdRef.current === targetId) return  // same target, skip
+    dragOverIdRef.current = targetId
+    setDragOverId(targetId)
+    // Live reorder — shift items immediately so the list updates in real time
     const items = [...section.items]
     const from  = items.findIndex(i => i.id === dragId.current)
     const to    = items.findIndex(i => i.id === targetId)
+    if (from === -1 || to === -1 || from === to) return
     const [moved] = items.splice(from, 1)
     items.splice(to, 0, moved)
     onChange({ ...section, items })
-    dragId.current = null
+  }
+
+  function handleDragLeave() { setDragOverId(null) }
+
+  function handleDrop() {
+    didDrop.current = true
+    setDraggingId(null); setDragOverId(null)
+    dragId.current = null; dragOverIdRef.current = null
+    // Items already in final position from live reordering — nothing else needed
+  }
+
+  function handleDragEnd() {
+    if (!didDrop.current && originalItems.current) {
+      // Drag cancelled (Escape / dropped outside) — restore original order
+      onChange({ ...section, items: originalItems.current })
+    }
+    setDraggingId(null); setDragOverId(null)
+    dragId.current = null; dragOverIdRef.current = null; originalItems.current = null
   }
   function addItem(catId, name = '') {
     onChange({ ...section, items: [...section.items, newItem(catId, name === 'Custom line item' ? '' : name, projectDesigner, projectRate)] })
@@ -175,7 +197,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
             onDragStart={() => handleDragStart(item.id)}
             onDragOver={() => handleDragOver(item.id)}
             onDragLeave={handleDragLeave}
-            onDrop={() => handleDrop(item.id)}
+            onDrop={handleDrop}
             onDragEnd={handleDragEnd}
             isDragging={draggingId === item.id}
             isDragOver={dragOverId === item.id}
@@ -207,7 +229,7 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
                 onDragStart={() => handleDragStart(item.id)}
                 onDragOver={() => handleDragOver(item.id)}
                 onDragLeave={handleDragLeave}
-                onDrop={() => handleDrop(item.id)}
+                onDrop={handleDrop}
                 onDragEnd={handleDragEnd}
                 isDragging={draggingId === item.id}
                 isDragOver={dragOverId === item.id}

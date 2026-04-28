@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { nanoid } from '../utils/nanoid.js'
 import { useRates } from '../contexts/RatesContext.jsx'
 
-const DESIGN_RESOURCES = ['stef', 'becky', 'brandon', 'julio']
 
 const CHEVRON = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a1a1aa'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`
 const selectStyle = {
@@ -51,7 +50,9 @@ export default function ProjectMeta({
   const [newName, setNewName]           = useState('')
   const [otherContact, setOtherContact] = useState(false)
 
-  const selectedClient = clients.find(c => c.id === clientId)
+  const selectedClient   = clients.find(c => c.id === clientId)
+  const knownContacts    = selectedClient?.contacts ?? []
+  const showCustomContact = otherContact || (contact !== '' && !knownContacts.includes(contact))
 
   function confirmNewClient() {
     const name = newName.trim()
@@ -204,9 +205,9 @@ export default function ProjectMeta({
             <span className="hidden sm:inline text-zinc-200 text-sm">·</span>
             <span className="text-xs font-black uppercase tracking-widest text-zinc-400 flex-shrink-0"
               style={{ fontFamily: 'var(--font-body)' }}>Contact</span>
-            {otherContact ? (
+            {showCustomContact ? (
               <input
-                autoFocus value={contact}
+                autoFocus={otherContact} value={contact}
                 onChange={e => setContact(e.target.value)}
                 onBlur={() => { if (!contact) setOtherContact(false) }}
                 placeholder="Contact name…"
@@ -221,7 +222,7 @@ export default function ProjectMeta({
                 style={selectStyle}
               >
                 <option value="">Select contact…</option>
-                {(selectedClient?.contacts ?? []).map(c => <option key={c} value={c}>{c}</option>)}
+                {knownContacts.map(c => <option key={c} value={c}>{c}</option>)}
                 <option value="__other__">Other…</option>
               </select>
             )}
@@ -301,8 +302,8 @@ export default function ProjectMeta({
             className="focus-light border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-zinc-800 bg-white outline-none focus:border-zinc-900 cursor-pointer appearance-none pr-7"
             style={selectStyle}
           >
-            {DESIGN_RESOURCES.map(key => resources[key] && (
-              <option key={key} value={key}>{resources[key].label}</option>
+            {Object.entries(resources).map(([key, r]) => (
+              <option key={key} value={key}>{r.label}</option>
             ))}
           </select>
         </div>

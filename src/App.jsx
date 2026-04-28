@@ -516,31 +516,33 @@ export default function App() {
                   {projectName || 'Project Estimate'}
                 </h1>
                 {projectDescription && (
-                  <p className="text-zinc-500 text-base font-medium mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+                  <p className="text-zinc-500 text-sm font-medium mb-2" style={{ fontFamily: 'var(--font-body)' }}>
                     {projectDescription}
                   </p>
                 )}
                 {(clientName || contact) && (
-                  <p className="text-zinc-600 text-sm font-semibold" style={{ fontFamily: 'var(--font-body)' }}>
+                  <p className="text-zinc-900 text-sm font-bold mt-1" style={{ fontFamily: 'var(--font-body)' }}>
                     {[clientName, contact].filter(Boolean).join(' · ')}
                   </p>
                 )}
                 {clientAddress && (
-                  <p className="text-zinc-500 text-sm mt-0.5 whitespace-pre-line" style={{ fontFamily: 'var(--font-body)' }}>
+                  <p className="text-zinc-500 text-xs mt-0.5 whitespace-pre-line" style={{ fontFamily: 'var(--font-body)' }}>
                     {clientAddress}
                   </p>
                 )}
-                <div className="mt-3 flex items-center gap-3">
-                  <span className="text-xs font-black font-mono text-zinc-900 bg-zinc-100 px-2 py-0.5 rounded"
-                    style={{ fontFamily: 'var(--font-body)' }}>
-                    {estimateNumber}
-                  </span>
-                  <span className="text-zinc-400 text-xs font-mono">{formattedDate}</span>
-                </div>
-                {expiryDate && (
-                  <p className="text-zinc-400 text-xs mt-0.5" style={{ fontFamily: 'var(--font-body)' }}>
-                    Valid through {expiryDate}
+                <div className="mt-4 pt-3 border-t border-zinc-100">
+                  {estimateNumber && (
+                    <p className="text-xs font-bold text-zinc-900 mb-1" style={{ fontFamily: 'var(--font-body)' }}>
+                      {estimateNumber}
+                    </p>
+                  )}
+                  <p className="text-xs text-zinc-500 mb-0.5" style={{ fontFamily: 'var(--font-body)' }}>
+                    <span className="font-bold text-zinc-700">Estimate Date:</span> {formattedDate}
                   </p>
+                  {expiryDate && (
+                    <p className="text-xs text-zinc-500" style={{ fontFamily: 'var(--font-body)' }}>
+                      <span className="font-bold text-zinc-700">Valid Through:</span> {expiryDate}
+                    </p>
                 )}
               </div>
 

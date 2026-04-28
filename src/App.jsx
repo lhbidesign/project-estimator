@@ -477,13 +477,18 @@ export default function App() {
             )}
             <div className="mt-4 pt-3" style={{ borderTop: '1px solid #e0e0e0' }}>
               {estimateNumber && (
-                <p className="text-xs font-bold mb-0.5" style={{ fontFamily: 'var(--font-body)', color: '#111' }}>
+                <p className="text-xs font-bold mb-2" style={{ fontFamily: 'var(--font-body)', color: '#111' }}>
                   {estimateNumber}
                 </p>
               )}
-              <p className="text-xs" style={{ fontFamily: 'var(--font-body)', color: '#555' }}>
-                {formattedDate}{expiryDate ? ` · Valid through ${expiryDate}` : ''}
+              <p className="text-xs mb-1" style={{ fontFamily: 'var(--font-body)', color: '#555' }}>
+                <span style={{ fontWeight: 700, color: '#333' }}>Estimate Date:</span> {formattedDate}
               </p>
+              {expiryDate && (
+                <p className="text-xs" style={{ fontFamily: 'var(--font-body)', color: '#555' }}>
+                  <span style={{ fontWeight: 700, color: '#333' }}>Valid Through:</span> {expiryDate}
+                </p>
+              )}
             </div>
           </div>
           <div className="flex flex-col items-end gap-1 flex-shrink-0">

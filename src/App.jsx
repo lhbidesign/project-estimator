@@ -543,7 +543,8 @@ export default function App() {
                     <p className="text-xs text-zinc-500" style={{ fontFamily: 'var(--font-body)' }}>
                       <span className="font-bold text-zinc-700">Valid Through:</span> {expiryDate}
                     </p>
-                )}
+                  )}
+                </div>
               </div>
 
               {/* Right: logo + ESTIMATE label + print */}

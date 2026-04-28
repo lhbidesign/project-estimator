@@ -523,7 +523,16 @@ export default function App() {
                   </p>
                 </div>
                 <button
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    const slug = [clientName, 'LH', estimateNumber]
+                      .filter(Boolean)
+                      .map(s => s.replace(/\s+/g, '-'))
+                      .join('-')
+                    const prev = document.title
+                    document.title = slug || prev
+                    window.print()
+                    document.title = prev
+                  }}
                   className="focus-light px-4 py-2 border border-zinc-300 text-zinc-500 text-xs font-bold uppercase tracking-widest hover:border-zinc-900 hover:text-zinc-900 transition-all rounded-lg"
                   style={{ fontFamily: 'var(--font-body)' }}
                 >

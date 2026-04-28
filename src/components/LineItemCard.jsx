@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import { useRates } from '../contexts/RatesContext.jsx'
 import { calcLine, fmt, fmtPct, marginColor } from '../utils/calc.js'
 
@@ -7,7 +8,7 @@ const GM_PILL = {
   red:    'bg-red-50   text-red-700   border border-red-200',
 }
 
-export default function LineItemCard({ item, onChange, onDelete, onDragStart, onDrop, onDragEnd, isDragging }) {
+const LineItemCard = forwardRef(function LineItemCard({ item, onChange, onDelete, dragHandleProps, cardStyle, isDragging }, ref) {
   const { resources } = useRates()
   const { billed, internal, gm, rate, isFlat } = calcLine(item, resources)
   const mc = marginColor(gm)
@@ -19,23 +20,23 @@ export default function LineItemCard({ item, onChange, onDelete, onDragStart, on
 
   return (
     <div
+      ref={ref}
       className="bg-white rounded-xl p-4 shadow-sm"
-      draggable
-      onDragStart={onDragStart}
-      onDragOver={e => e.preventDefault()}
-      onDrop={e => { e.preventDefault(); onDrop?.() }}
-      onDragEnd={onDragEnd}
       style={{
         fontFamily: 'var(--font-body)',
         border: '1px solid #e4e4e7',
-        opacity: isDragging ? 0.35 : 1,
-        transition: 'opacity 0.15s ease',
+        opacity: isDragging ? 0 : 1,
+        ...cardStyle,
       }}
     >
 
       {/* Row 1: Drag handle + Name + delete */}
       <div className="flex items-start gap-2 mb-3">
-        <span className="cursor-grab active:cursor-grabbing text-zinc-300 select-none mt-1 flex-shrink-0" style={{ fontSize: 16 }}>⠿</span>
+        <span
+          {...dragHandleProps}
+          className="cursor-grab active:cursor-grabbing text-zinc-300 select-none mt-1 flex-shrink-0 touch-none"
+          style={{ fontSize: 16 }}
+        >⠿</span>
         <input
           value={item.name}
           onChange={e => set('name', e.target.value)}
@@ -146,4 +147,6 @@ export default function LineItemCard({ item, onChange, onDelete, onDragStart, on
       )}
     </div>
   )
-}
+})
+
+export default LineItemCard

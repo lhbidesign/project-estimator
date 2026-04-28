@@ -1,8 +1,14 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
+import {
+  DndContext, DragOverlay, closestCenter,
+  MouseSensor, TouchSensor, useSensor, useSensors,
+} from '@dnd-kit/core'
+import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import LineItemRow from './LineItemRow.jsx'
 import LineItemCard from './LineItemCard.jsx'
 import { CATEGORIES } from '../data/rates.js'
-import { calcSection, fmt } from '../utils/calc.js'
+import { calcSection, calcLine, fmt } from '../utils/calc.js'
 import { useRates } from '../contexts/RatesContext.jsx'
 import { nanoid } from '../utils/nanoid.js'
 
@@ -18,24 +24,24 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
   const { resources } = useRates()
   const totals = calcSection(section.items, resources)
 
-  const dragId = useRef(null)
-  const [draggingId, setDraggingId] = useState(null)
+  const [activeId, setActiveId] = useState(null)
+  const activeItem = section.items.find(i => i.id === activeId) ?? null
+
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor,  { activationConstraint: { delay: 200, tolerance: 6 } }),
+  )
 
   function updateItem(id, u) { onChange({ ...section, items: section.items.map(i => i.id === id ? u : i) }) }
   function deleteItem(id)    { onChange({ ...section, items: section.items.filter(i => i.id !== id) }) }
 
-  function handleDragStart(id) { dragId.current = id; setDraggingId(id) }
-  function handleDragEnd()     { setDraggingId(null); dragId.current = null }
-  function handleDrop(targetId) {
-    setDraggingId(null)
-    if (!dragId.current || dragId.current === targetId) { dragId.current = null; return }
-    const items = [...section.items]
-    const from  = items.findIndex(i => i.id === dragId.current)
-    const to    = items.findIndex(i => i.id === targetId)
-    const [moved] = items.splice(from, 1)
-    items.splice(to, 0, moved)
-    onChange({ ...section, items })
-    dragId.current = null
+  function onDragStart({ active }) { setActiveId(active.id) }
+  function onDragEnd({ active, over }) {
+    setActiveId(null)
+    if (!over || active.id === over.id) return
+    const oldIdx = section.items.findIndex(i => i.id === active.id)
+    const newIdx = section.items.findIndex(i => i.id === over.id)
+    onChange({ ...section, items: arrayMove(section.items, oldIdx, newIdx) })
   }
   function addItem(catId, name = '') {
     onChange({ ...section, items: [...section.items, newItem(catId, name === 'Custom line item' ? '' : name, projectDesigner, projectRate)] })
@@ -133,88 +139,158 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
     </div>
   )
 
+  const itemIds = section.items.map(i => i.id)
+
   return (
-    <div className="mb-3 bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
-      {!isOnlySection && (
-        <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-zinc-100 bg-zinc-50 group/lbl">
-          <input
-            value={section.label}
-            onChange={e => onChange({ ...section, label: e.target.value })}
-            placeholder="Section / Program name"
-            className="focus-light bg-transparent text-xs font-black uppercase tracking-widest text-zinc-600 outline-none placeholder-zinc-400 focus:text-zinc-900 flex-1"
-            style={{ fontFamily: 'var(--font-body)' }}
-          />
-          <button
-            onClick={onDeleteSection}
-            className="focus-light text-zinc-400 hover:text-red-500 text-xs font-semibold transition-all ml-4 sm:opacity-0 sm:group-hover/lbl:opacity-100"
-          >
-            Remove
-          </button>
-        </div>
-      )}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+    >
+      <div className="mb-3 bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
+        {!isOnlySection && (
+          <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-zinc-100 bg-zinc-50 group/lbl">
+            <input
+              value={section.label}
+              onChange={e => onChange({ ...section, label: e.target.value })}
+              placeholder="Section / Program name"
+              className="focus-light bg-transparent text-xs font-black uppercase tracking-widest text-zinc-600 outline-none placeholder-zinc-400 focus:text-zinc-900 flex-1"
+              style={{ fontFamily: 'var(--font-body)' }}
+            />
+            <button
+              onClick={onDeleteSection}
+              className="focus-light text-zinc-400 hover:text-red-500 text-xs font-semibold transition-all ml-4 sm:opacity-0 sm:group-hover/lbl:opacity-100"
+            >
+              Remove
+            </button>
+          </div>
+        )}
 
-      {/* Mobile: card list */}
-      <div className="sm:hidden p-3 space-y-2">
-        {section.items.length === 0 ? (
-          <p className="text-sm text-zinc-400 italic py-4 text-center" style={{ fontFamily: 'var(--font-body)' }}>
-            Add a deliverable below
-          </p>
-        ) : section.items.map(item => (
-          <LineItemCard
-            key={item.id} item={item}
-            onChange={u => updateItem(item.id, u)}
-            onDelete={() => deleteItem(item.id)}
-            onDragStart={() => handleDragStart(item.id)}
-            onDrop={() => handleDrop(item.id)}
-            onDragEnd={handleDragEnd}
-            isDragging={draggingId === item.id}
-          />
-        ))}
-      </div>
-
-      {/* Desktop: table */}
-      <div className="hidden sm:block">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-zinc-50 border-b border-zinc-200">
-              {[['', 'w-5 pl-2'], ['Deliverable', 'pl-1 pr-3 text-left'], ['Resource', 'pr-3 text-left'], ['Rate', 'pr-3 text-right'], ['Hrs', 'pr-3 text-right'], ['Cost', 'pr-4 text-right'], ['Billed', 'pr-4 text-right'], ['GM%', 'pr-3 text-right'], ['', 'pr-3 w-8']].map(([h, cls]) => (
-                <th key={h} className={`py-2.5 text-xs font-black uppercase tracking-wider text-zinc-400 ${cls}`}
-                  style={{ fontFamily: 'var(--font-body)' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
+        <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+          {/* Mobile: card list */}
+          <div className="sm:hidden p-3 space-y-2">
             {section.items.length === 0 ? (
-              <tr><td colSpan={9} className="pl-5 py-5 text-sm text-zinc-400 italic" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-sm text-zinc-400 italic py-4 text-center" style={{ fontFamily: 'var(--font-body)' }}>
                 Add a deliverable below
-              </td></tr>
+              </p>
             ) : section.items.map(item => (
-              <LineItemRow
-                key={item.id} item={item} view="internal"
+              <SortableCard
+                key={item.id} item={item}
                 onChange={u => updateItem(item.id, u)}
                 onDelete={() => deleteItem(item.id)}
-                onDragStart={() => handleDragStart(item.id)}
-                onDrop={() => handleDrop(item.id)}
-                onDragEnd={handleDragEnd}
-                isDragging={draggingId === item.id}
+                isDragging={activeId === item.id}
               />
             ))}
-          </tbody>
-        </table>
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden sm:block">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-zinc-50 border-b border-zinc-200">
+                  {[['', 'w-5 pl-2'], ['Deliverable', 'pl-1 pr-3 text-left'], ['Resource', 'pr-3 text-left'], ['Rate', 'pr-3 text-right'], ['Hrs', 'pr-3 text-right'], ['Cost', 'pr-4 text-right'], ['Billed', 'pr-4 text-right'], ['GM%', 'pr-3 text-right'], ['', 'pr-3 w-8']].map(([h, cls]) => (
+                    <th key={h} className={`py-2.5 text-xs font-black uppercase tracking-wider text-zinc-400 ${cls}`}
+                      style={{ fontFamily: 'var(--font-body)' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {section.items.length === 0 ? (
+                  <tr><td colSpan={9} className="pl-5 py-5 text-sm text-zinc-400 italic" style={{ fontFamily: 'var(--font-body)' }}>
+                    Add a deliverable below
+                  </td></tr>
+                ) : section.items.map(item => (
+                  <SortableRow
+                    key={item.id} item={item}
+                    onChange={u => updateItem(item.id, u)}
+                    onDelete={() => deleteItem(item.id)}
+                    isDragging={activeId === item.id}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </SortableContext>
+
+        {!isOnlySection && section.items.length > 0 && (
+          <div className="flex justify-end px-4 sm:px-5 py-3 border-t border-zinc-100 bg-zinc-50">
+            <div className="flex items-baseline gap-3">
+              <span className="text-xs font-black uppercase tracking-wider text-zinc-400"
+                style={{ fontFamily: 'var(--font-body)' }}>Section subtotal</span>
+              <span className="text-sm font-black text-zinc-900 tabular"
+                style={{ fontFamily: 'var(--font-body)' }}>{fmt(totals.billed)}</span>
+            </div>
+          </div>
+        )}
+
+        {addControls}
       </div>
 
-      {!isOnlySection && section.items.length > 0 && (
-        <div className="flex justify-end px-4 sm:px-5 py-3 border-t border-zinc-100 bg-zinc-50">
-          <div className="flex items-baseline gap-3">
-            <span className="text-xs font-black uppercase tracking-wider text-zinc-400"
-              style={{ fontFamily: 'var(--font-body)' }}>Section subtotal</span>
-            <span className="text-sm font-black text-zinc-900 tabular"
-              style={{ fontFamily: 'var(--font-body)' }}>{fmt(totals.billed)}</span>
-          </div>
-        </div>
-      )}
+      {/* Floating ghost — shown while dragging */}
+      <DragOverlay dropAnimation={{ duration: 180, easing: 'cubic-bezier(0.34,1.56,0.64,1)' }}>
+        {activeItem ? <DragGhost item={activeItem} resources={resources} /> : null}
+      </DragOverlay>
+    </DndContext>
+  )
+}
 
-      {addControls}
+/* ── Sortable wrappers ── */
+
+function SortableRow({ item, onChange, onDelete, isDragging }) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id })
+  return (
+    <LineItemRow
+      ref={setNodeRef}
+      item={item} view="internal"
+      onChange={onChange}
+      onDelete={onDelete}
+      isDragging={isDragging}
+      dragHandleProps={{ ...listeners, ...attributes }}
+      rowStyle={{
+        transform: CSS.Transform.toString(transform),
+        transition: transition ?? 'transform 200ms cubic-bezier(0.34,1.56,0.64,1)',
+      }}
+    />
+  )
+}
+
+function SortableCard({ item, onChange, onDelete, isDragging }) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id })
+  return (
+    <LineItemCard
+      ref={setNodeRef}
+      item={item}
+      onChange={onChange}
+      onDelete={onDelete}
+      isDragging={isDragging}
+      dragHandleProps={{ ...listeners, ...attributes }}
+      cardStyle={{
+        transform: CSS.Transform.toString(transform),
+        transition: transition ?? 'transform 200ms cubic-bezier(0.34,1.56,0.64,1)',
+      }}
+    />
+  )
+}
+
+/* Elevated ghost card that follows the cursor */
+function DragGhost({ item, resources }) {
+  const { billed, isFlat } = calcLine(item, resources)
+  return (
+    <div
+      className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 select-none"
+      style={{
+        fontFamily: 'var(--font-body)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.18), 0 6px 12px rgba(0,0,0,0.1)',
+        transform: 'rotate(1deg) scale(1.03)',
+        border: '1px solid #e4e4e7',
+        width: 380,
+        maxWidth: '90vw',
+      }}
+    >
+      <span className="text-zinc-300 select-none flex-shrink-0" style={{ fontSize: 16 }}>⠿</span>
+      <span className="flex-1 text-sm font-medium text-zinc-800 truncate">{item.name || 'Untitled'}</span>
+      <span className="text-sm font-bold text-zinc-900 tabular">{isFlat ? 'Flat' : fmt(billed)}</span>
     </div>
   )
 }

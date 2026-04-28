@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import { useRates } from '../contexts/RatesContext.jsx'
 import { calcLine, fmt, fmtPct, marginColor } from '../utils/calc.js'
 
@@ -7,7 +8,7 @@ const GM_PILL = {
   red:    'bg-red-50   text-red-700   border border-red-200',
 }
 
-export default function LineItemRow({ item, view, onChange, onDelete, hideHours, hideRate, onDragStart, onDrop, onDragEnd, isDragging }) {
+const LineItemRow = forwardRef(function LineItemRow({ item, view, onChange, onDelete, hideHours, hideRate, dragHandleProps, rowStyle, isDragging }, ref) {
   const { resources } = useRates()
   const { billed, internal, gm, rate, isFlat } = calcLine(item, resources)
   const mc = marginColor(gm)
@@ -44,19 +45,16 @@ export default function LineItemRow({ item, view, onChange, onDelete, hideHours,
   /* ── INTERNAL VIEW ── */
   return (
     <tr
-      className="border-b border-zinc-100 last:border-0 group hover:bg-zinc-50/70 transition-colors"
-      draggable
-      onDragStart={onDragStart}
-      onDragOver={e => e.preventDefault()}
-      onDrop={e => { e.preventDefault(); onDrop?.() }}
-      onDragEnd={onDragEnd}
-      style={{
-        opacity: isDragging ? 0.35 : 1,
-        transition: 'opacity 0.15s ease',
-      }}
+      ref={ref}
+      className="border-b border-zinc-100 last:border-0 group hover:bg-zinc-50/70"
+      style={{ ...rowStyle, opacity: isDragging ? 0 : 1 }}
     >
       {/* Drag handle */}
-      <td className="pl-2 pr-1 w-5 cursor-grab active:cursor-grabbing text-zinc-300 group-hover:text-zinc-400 select-none" style={{ fontSize: 14 }}>
+      <td
+        {...dragHandleProps}
+        className="pl-2 pr-1 w-5 cursor-grab active:cursor-grabbing text-zinc-300 group-hover:text-zinc-400 select-none touch-none"
+        style={{ fontSize: 14 }}
+      >
         ⠿
       </td>
       <td className="py-2.5 pr-3 pl-1">
@@ -183,4 +181,6 @@ export default function LineItemRow({ item, view, onChange, onDelete, hideHours,
       </td>
     </tr>
   )
-}
+})
+
+export default LineItemRow

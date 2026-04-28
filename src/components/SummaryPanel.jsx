@@ -19,16 +19,14 @@ export default function SummaryPanel({ sections, pmPercent, setPmPercent, view }
   if (view === 'client') {
     return (
       <div className="mt-6 pt-6 border-t-2 border-zinc-200">
-        <div className="max-w-xs ml-auto space-y-2">
-          {pmPercent > 0 && (
-            <>
-              <SRow label="Subtotal" value={fmt(p.subtotal)} />
-              <SRow label={`Project Management (${pmPercent}%)`} value={fmt(p.pmBilled)} />
-            </>
-          )}
-          <div className={pmPercent > 0 ? 'pt-3 mt-3 border-t border-zinc-200' : ''}>
-            <SRow label="Total" value={fmt(p.totalBilled)} strong />
+        {pmPercent > 0 && (
+          <div className="space-y-1.5 mb-3">
+            <TRow label="Subtotal"                              value={fmt(p.subtotal)} />
+            <TRow label={`Project Management (${pmPercent}%)`} value={fmt(p.pmBilled)} />
           </div>
+        )}
+        <div className={pmPercent > 0 ? 'pt-3 mt-1 border-t border-zinc-200' : ''}>
+          <TRow label="Total" value={fmt(p.totalBilled)} strong />
         </div>
       </div>
     )
@@ -81,8 +79,15 @@ export default function SummaryPanel({ sections, pmPercent, setPmPercent, view }
             </div>
             <PRow label="Subtotal (pre-PM)"      value={fmt(p.subtotal)} />
             {pmPercent > 0 && <PRow label="PM overhead" value={fmt(p.pmBilled)} />}
-            <div className="border-t border-zinc-100 pt-2 mt-2">
-              <PRow label="Total billed to client" value={fmt(p.totalBilled)} strong />
+            <div className="border-t border-zinc-100 pt-3 mt-2">
+              <div className="flex justify-between items-baseline gap-4">
+                <span className="text-sm font-semibold text-zinc-900" style={{ fontFamily: 'var(--font-body)' }}>
+                  Total billed to client
+                </span>
+                <span className="text-2xl font-black tabular text-zinc-900" style={{ fontFamily: 'var(--font-display)' }}>
+                  {fmt(p.totalBilled)}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -126,13 +131,13 @@ function PRow({ label, value, dim, strong }) {
   )
 }
 
-function SRow({ label, value, strong }) {
+/* Right-grouped total row — label + amount sit close together on the right */
+function TRow({ label, value, strong }) {
   return (
-    <div className="flex justify-between items-baseline gap-6">
-      <span className={`text-sm ${strong ? 'font-bold text-zinc-900' : 'text-zinc-500'}`}
-        style={{ fontFamily: 'var(--font-body)' }}>{label}</span>
-      <span className={`tabular ${strong ? 'text-xl font-black text-zinc-900' : 'text-zinc-700'}`}
-        style={{ fontFamily: 'var(--font-body)' }}>{value}</span>
+    <div className="flex items-baseline justify-end gap-6" style={{ fontFamily: 'var(--font-body)' }}>
+      <span className={`text-sm ${strong ? 'font-bold text-zinc-900' : 'text-zinc-500'}`}>{label}</span>
+      <span className={`tabular text-right ${strong ? 'text-xl font-black text-zinc-900' : 'text-zinc-700 text-sm'}`}
+        style={{ minWidth: '5rem' }}>{value}</span>
     </div>
   )
 }

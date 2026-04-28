@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import LineItemRow from './LineItemRow.jsx'
 import LineItemCard from './LineItemCard.jsx'
 import { CATEGORIES } from '../data/rates.js'
@@ -18,14 +18,25 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
   const { resources } = useRates()
   const totals = calcSection(section.items, resources)
 
-  const dragId = useRef(null)
+  const dragId    = useRef(null)
+  const [draggingId, setDraggingId] = useState(null)
+  const [dragOverId, setDragOverId] = useState(null)
 
-  function updateItem(id, u)  { onChange({ ...section, items: section.items.map(i => i.id === id ? u : i) }) }
-  function deleteItem(id)     { onChange({ ...section, items: section.items.filter(i => i.id !== id) }) }
+  function updateItem(id, u) { onChange({ ...section, items: section.items.map(i => i.id === id ? u : i) }) }
+  function deleteItem(id)    { onChange({ ...section, items: section.items.filter(i => i.id !== id) }) }
 
-  function handleDragStart(id) { dragId.current = id }
+  function handleDragStart(id) {
+    dragId.current = id
+    setDraggingId(id)
+  }
+  function handleDragOver(id) {
+    if (dragId.current && dragId.current !== id) setDragOverId(id)
+  }
+  function handleDragLeave() { setDragOverId(null) }
+  function handleDragEnd()   { setDraggingId(null); setDragOverId(null); dragId.current = null }
   function handleDrop(targetId) {
-    if (!dragId.current || dragId.current === targetId) return
+    setDraggingId(null); setDragOverId(null)
+    if (!dragId.current || dragId.current === targetId) { dragId.current = null; return }
     const items = [...section.items]
     const from  = items.findIndex(i => i.id === dragId.current)
     const to    = items.findIndex(i => i.id === targetId)
@@ -162,7 +173,12 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
             onChange={u => updateItem(item.id, u)}
             onDelete={() => deleteItem(item.id)}
             onDragStart={() => handleDragStart(item.id)}
+            onDragOver={() => handleDragOver(item.id)}
+            onDragLeave={handleDragLeave}
             onDrop={() => handleDrop(item.id)}
+            onDragEnd={handleDragEnd}
+            isDragging={draggingId === item.id}
+            isDragOver={dragOverId === item.id}
           />
         ))}
       </div>
@@ -189,7 +205,12 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
                 onChange={u => updateItem(item.id, u)}
                 onDelete={() => deleteItem(item.id)}
                 onDragStart={() => handleDragStart(item.id)}
+                onDragOver={() => handleDragOver(item.id)}
+                onDragLeave={handleDragLeave}
                 onDrop={() => handleDrop(item.id)}
+                onDragEnd={handleDragEnd}
+                isDragging={draggingId === item.id}
+                isDragOver={dragOverId === item.id}
               />
             ))}
           </tbody>

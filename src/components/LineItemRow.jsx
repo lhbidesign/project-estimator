@@ -7,7 +7,7 @@ const GM_PILL = {
   red:    'bg-red-50   text-red-700   border border-red-200',
 }
 
-export default function LineItemRow({ item, view, onChange, onDelete, hideHours, hideRate, onDragStart, onDrop }) {
+export default function LineItemRow({ item, view, onChange, onDelete, hideHours, hideRate, onDragStart, onDragOver, onDragLeave, onDrop, onDragEnd, isDragging, isDragOver }) {
   const { resources } = useRates()
   const { billed, internal, gm, rate, isFlat } = calcLine(item, resources)
   const mc = marginColor(gm)
@@ -47,8 +47,16 @@ export default function LineItemRow({ item, view, onChange, onDelete, hideHours,
       className="border-b border-zinc-100 last:border-0 group hover:bg-zinc-50/70 transition-colors"
       draggable
       onDragStart={onDragStart}
-      onDragOver={e => e.preventDefault()}
+      onDragOver={e => { e.preventDefault(); onDragOver?.() }}
+      onDragLeave={onDragLeave}
       onDrop={onDrop}
+      onDragEnd={onDragEnd}
+      style={{
+        opacity: isDragging ? 0.35 : 1,
+        transition: 'opacity 0.15s ease',
+        boxShadow: isDragOver ? 'inset 0 2px 0 0 #CCFF00' : 'none',
+        background: isDragOver ? 'rgba(204,255,0,0.06)' : undefined,
+      }}
     >
       {/* Drag handle */}
       <td className="pl-2 pr-1 w-5 cursor-grab active:cursor-grabbing text-zinc-300 group-hover:text-zinc-400 select-none" style={{ fontSize: 14 }}>

@@ -18,54 +18,24 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
   const { resources } = useRates()
   const totals = calcSection(section.items, resources)
 
-  const dragId         = useRef(null)
-  const dragOverIdRef  = useRef(null)       // dedupe rapid dragOver events
-  const originalItems  = useRef(null)       // restore on Escape / drag cancel
-  const didDrop        = useRef(false)
-  const [draggingId,  setDraggingId]  = useState(null)
-  const [dragOverId,  setDragOverId]  = useState(null)
+  const dragId = useRef(null)
+  const [draggingId, setDraggingId] = useState(null)
 
   function updateItem(id, u) { onChange({ ...section, items: section.items.map(i => i.id === id ? u : i) }) }
   function deleteItem(id)    { onChange({ ...section, items: section.items.filter(i => i.id !== id) }) }
 
-  function handleDragStart(id) {
-    dragId.current      = id
-    didDrop.current     = false
-    originalItems.current = [...section.items]
-    setDraggingId(id)
-  }
-
-  function handleDragOver(targetId) {
-    if (!dragId.current || dragId.current === targetId) return
-    if (dragOverIdRef.current === targetId) return  // same target, skip
-    dragOverIdRef.current = targetId
-    setDragOverId(targetId)
-    // Live reorder — shift items immediately so the list updates in real time
+  function handleDragStart(id) { dragId.current = id; setDraggingId(id) }
+  function handleDragEnd()     { setDraggingId(null); dragId.current = null }
+  function handleDrop(targetId) {
+    setDraggingId(null)
+    if (!dragId.current || dragId.current === targetId) { dragId.current = null; return }
     const items = [...section.items]
     const from  = items.findIndex(i => i.id === dragId.current)
     const to    = items.findIndex(i => i.id === targetId)
-    if (from === -1 || to === -1 || from === to) return
     const [moved] = items.splice(from, 1)
     items.splice(to, 0, moved)
     onChange({ ...section, items })
-  }
-
-  function handleDragLeave() { setDragOverId(null) }
-
-  function handleDrop() {
-    didDrop.current = true
-    setDraggingId(null); setDragOverId(null)
-    dragId.current = null; dragOverIdRef.current = null
-    // Items already in final position from live reordering — nothing else needed
-  }
-
-  function handleDragEnd() {
-    if (!didDrop.current && originalItems.current) {
-      // Drag cancelled (Escape / dropped outside) — restore original order
-      onChange({ ...section, items: originalItems.current })
-    }
-    setDraggingId(null); setDragOverId(null)
-    dragId.current = null; dragOverIdRef.current = null; originalItems.current = null
+    dragId.current = null
   }
   function addItem(catId, name = '') {
     onChange({ ...section, items: [...section.items, newItem(catId, name === 'Custom line item' ? '' : name, projectDesigner, projectRate)] })
@@ -195,12 +165,9 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
             onChange={u => updateItem(item.id, u)}
             onDelete={() => deleteItem(item.id)}
             onDragStart={() => handleDragStart(item.id)}
-            onDragOver={() => handleDragOver(item.id)}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
+            onDrop={() => handleDrop(item.id)}
             onDragEnd={handleDragEnd}
             isDragging={draggingId === item.id}
-            isDragOver={dragOverId === item.id}
           />
         ))}
       </div>
@@ -227,12 +194,9 @@ export default function CategorySection({ section, view, onChange, onDeleteSecti
                 onChange={u => updateItem(item.id, u)}
                 onDelete={() => deleteItem(item.id)}
                 onDragStart={() => handleDragStart(item.id)}
-                onDragOver={() => handleDragOver(item.id)}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
+                onDrop={() => handleDrop(item.id)}
                 onDragEnd={handleDragEnd}
                 isDragging={draggingId === item.id}
-                isDragOver={dragOverId === item.id}
               />
             ))}
           </tbody>

@@ -7,7 +7,7 @@ const GM_PILL = {
   red:    'bg-red-50   text-red-700   border border-red-200',
 }
 
-export default function LineItemCard({ item, onChange, onDelete, onDragStart, onDragOver, onDragLeave, onDrop, onDragEnd, isDragging, isDragOver }) {
+export default function LineItemCard({ item, onChange, onDelete, onDragStart, onDrop, onDragEnd, isDragging }) {
   const { resources } = useRates()
   const { billed, internal, gm, rate, isFlat } = calcLine(item, resources)
   const mc = marginColor(gm)
@@ -22,17 +22,14 @@ export default function LineItemCard({ item, onChange, onDelete, onDragStart, on
       className="bg-white rounded-xl p-4 shadow-sm"
       draggable
       onDragStart={onDragStart}
-      onDragOver={e => { e.preventDefault(); onDragOver?.() }}
-      onDragLeave={onDragLeave}
+      onDragOver={e => e.preventDefault()}
       onDrop={e => { e.preventDefault(); onDrop?.() }}
       onDragEnd={onDragEnd}
       style={{
         fontFamily: 'var(--font-body)',
-        border: isDragOver ? '2px solid #2563EB' : '1px solid #e4e4e7',
-        background: isDragOver ? 'rgba(37,99,235,0.04)' : 'white',
+        border: '1px solid #e4e4e7',
         opacity: isDragging ? 0.35 : 1,
-        transform: isDragOver ? 'scale(1.01)' : 'scale(1)',
-        transition: 'opacity 0.15s ease, transform 0.12s ease, border-color 0.1s ease, background 0.1s ease',
+        transition: 'opacity 0.15s ease',
       }}
     >
 
